@@ -30,7 +30,7 @@
     return {date,available,unknown,price:available[0]?.price,status:available.length?'available':unknown?'unknown':values.some(v=>v.status==='restricted')?'restricted':'full'};
   }
   function bookingUrl(offer) {
-    const url=new URL('https://www.secure-hotel-booking.com/redirect/JLPH/28870');
+    const url=new URL('https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/');
     url.search=new URLSearchParams({arrivalDate:offer.date,departureDate:nextDate(offer.date),language:'fr-FR',selectedAdultCount:'2',roomAction:'filter',roomId:String(offer.room.id),currency:'EUR'});
     return url.href;
   }
