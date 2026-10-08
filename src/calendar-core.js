@@ -1,6 +1,6 @@
 (function(root) {
   const rooms = [
-    {id:140910,name:'La Tanière',animal:'Ours bruns',asset:'bear',color:'#a77c4c',page:'dormir-avec-les-ours-bruns'},
+    {id:140910,name:'La Tanière',animal:'Ours bruns',asset:'interior',color:'#a77c4c',page:'dormir-avec-les-ours-bruns'},
     {id:140908,name:'Le Refuge',animal:'Loups noirs',asset:'black',color:'#34575e',page:'dormir-avec-les-loups-noirs'},
     {id:140907,name:'La Cabane du Trappeur',animal:'Loups gris',asset:'grey',color:'#8c9c60',page:'nuits-insolites'},
     {id:163456,name:'Asian Lodge',animal:'Pandas roux',asset:'panda',color:'#bb6247',page:'dormir-avec-les-pandas-roux'}

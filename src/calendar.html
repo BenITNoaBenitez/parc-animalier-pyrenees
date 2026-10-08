@@ -1,14 +1,15 @@
 <section class="union-section" id="reservation" aria-label="Calendrier commun des quatre logements">
-  <div class="section-marker"><span>02 / Une nuit au parc</span><span>Prototype · réservation officielle D-EDGE</span></div>
+  <div class="section-marker"><span>03 / Calendrier commun aux 4 logements</span><span>Prototype · réservation officielle D-EDGE</span></div>
   <div class="stay-shell">
     <div class="stay-visual">
-      <img class="hero-photo" data-asset="bear" alt="Observer les ours depuis la chambre de La Tanière">
+      <img class="hero-photo" data-asset="interior" alt="Observer les ours depuis la chambre de La Tanière">
       <a class="park-logo" href="https://www.parc-animalier-pyrenees.com/" target="_blank" rel="noopener"><img data-asset="whiteLogo" alt="Parc Animalier des Pyrénées"></a>
-      <div class="visual-copy"><span class="eyebrow">LES HÉBERGEMENTS INSOLITES</span><h1>Dormir<br>au parc.</h1><div class="inclusions"><span>Dîner & petit-déjeuner</span><span>2 jours au parc inclus</span></div></div>
+      <div class="visual-copy"><span class="eyebrow">LES HÉBERGEMENTS INSOLITES</span><h1>Dormir<br> au parc.</h1><div class="inclusions"><span>Dîner & petit-déjeuner</span><span>2 jours au parc inclus</span></div></div>
       <div class="photo-credit">La Tanière · face aux ours bruns</div>
     </div>
     <div class="reservation-panel">
       <div class="panel-top"><span class="eyebrow">LES 4 LOGEMENTS, EN UN CALENDRIER</span><span class="live-indicator" id="live-status" role="status">Connexion…</span></div>
+      <div id="date-view">
       <h2>Choisissez votre nuit</h2><p class="booking-context">1 nuit <span>·</span> 2 adultes <span>·</span> Tous les logements</p>
       <div class="month-navigation"><button id="previous-month" aria-label="Mois précédent">‹</button><h3 id="month-title"></h3><button id="next-month" aria-label="Mois suivant">›</button></div>
       <div class="weekdays" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
@@ -17,15 +18,16 @@
       <div id="calendar-notice" class="calendar-notice" role="status"></div>
       <button class="retry" id="retry" hidden>Actualiser les disponibilités ↻</button>
       <div class="calendar-bottom"><span>Choisissez une date pour voir les logements.</span><a href="https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/" target="_blank" rel="noopener">Autres voyageurs ↗</a></div>
-    </div>
-  </div>
-  <div class="lodges-overview" id="lodges-overview" aria-label="Les quatre logements"></div>
-  <section class="selection" id="selection" hidden aria-labelledby="selection-title" tabindex="-1">
-    <div class="selection-heading"><div><span class="eyebrow" id="selected-dates"></span><h2 id="selection-title"></h2></div><button class="text-button" id="clear-selection">Changer de date ↑</button></div>
+      </div>
+      <section class="selection" id="selection" hidden aria-labelledby="selection-title" tabindex="-1">
+    <button class="text-button" id="clear-selection">← Changer de date</button>
+    <div class="selection-heading"><div><span class="eyebrow" id="selected-dates"></span><h2 id="selection-title"></h2></div></div>
     <p class="selection-status" id="selection-status" role="status"></p>
     <div class="room-results" id="room-results"></div>
     <p class="price-note">Tarif pour 1 nuit et 2 adultes. Hors taxe de séjour. Disponibilités, prix final et conditions confirmés sur le moteur officiel.</p>
-  </section>
+      </section>
+    </div>
+  </div>
   <div class="fine-print"><details><summary>Comment les disponibilités sont réunies</summary><p>Une date apparaît disponible dès qu’au moins un des quatre logements est réservable pour une nuit et deux adultes. Le tarif affiché est le moins cher parmi les logements disponibles. Un séjour minimum plus long n’est pas proposé comme une nuit disponible. Les données sont demandées au moteur D-EDGE et revérifiées au clic. Si un logement ne répond pas, ses dates restent inconnues : elles ne sont pas déclarées complètes.</p></details><details><summary>Sources & prototype</summary><p>Logo, photographies et informations : <a href="https://www.parc-animalier-pyrenees.com/" target="_blank" rel="noopener">Parc Animalier des Pyrénées</a>. Ceci est un prototype de présentation, pas le site officiel. Internet est nécessaire pour les tarifs et disponibilités. Aucun paiement ni suivi Google Analytics n’est réalisé ici.</p></details></div>
   <noscript>Activez JavaScript pour consulter les disponibilités, ou utilisez la réservation officielle.</noscript>
 </section>

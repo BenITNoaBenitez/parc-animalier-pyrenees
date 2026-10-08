@@ -1,6 +1,12 @@
 # Parc animalier des Pyrénées
 
-Prototype de présentation : schéma interactif et calendrier commun des quatre logements, pour **une nuit et deux adultes**.
+Prototype de présentation en trois parties :
+
+1. Schéma interactif du fonctionnement du site.
+2. Les huit ambiances de calendrier originales pour La Tanière, avec le widget D-EDGE.
+3. Calendrier commun des quatre logements, pour **une nuit et deux adultes**.
+
+Dans la troisième partie, le choix des logements, leurs prix et les boutons de réservation remplacent le mois **dans la même carte calendrier**. Le bouton « Changer de date » réaffiche le mois ; aucun panneau de choix n’est ajouté sous le calendrier. Les sources des anciens calendriers sont conservées dans `src/legacy/`.
 
 Le calendrier interroge le service public du widget D-EDGE séparément pour La Tanière (140910), Le Refuge (140908), La Cabane du Trappeur (140907) et Asian Lodge (163456). Une seule disponibilité suffit à rendre une date sélectionnable. Le calendrier affiche le prix minimum ; les cartes affichent les prix individuels. Une date sélectionnée est revérifiée avant de proposer les liens de réservation.
 

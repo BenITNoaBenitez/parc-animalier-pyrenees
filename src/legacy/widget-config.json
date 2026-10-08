@@ -1,0 +1,50 @@
+{
+  "params": [
+    {
+      "calendar": {
+        "firstDayOfWeek": 1,
+        "nbMonths2display": 1,
+        "title": "",
+        "showBestPrice": true,
+        "showLastRoom": false,
+        "showLastRoomThreshold": 5,
+        "showMinStayDepartureDates": true,
+        "hideControls": false,
+        "showChildrenAges": true,
+        "themeDark": false,
+        "layoutNum": 1,
+        "roomRateFiltering": 2,
+        "rateFilter": [],
+        "roomFilter": [
+          "140910"
+        ],
+        "useLoyalty": false,
+        "loyalty": "",
+        "loyaltyParams": {},
+        "useRedirectUrlFromApi": true,
+        "daysLookAhead": 1000
+      },
+      "currency": "EUR",
+      "locale": "fr_FR",
+      "maxAdults": 2,
+      "maxChildren": 1,
+      "mainColor": "#91ab2a",
+      "themeDark": false,
+      "openFrontInNewTab": true,
+      "property": "JLPH-28870",
+      "title": "Parc Animalier des Pyrénées",
+      "childrenMaxAge": 12,
+      "fbWidget": "Calendar"
+    }
+  ],
+  "commonParams": {
+    "redirectUrl": "https://www.secure-hotel-booking.com",
+    "showPropertiesList": true,
+    "demoMode": false,
+    "frontUrl": "https://www.secure-hotel-booking.com"
+  },
+  "_authCode": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJib29raW5nRW5naW5lUmVmZXJlbmNlIjoiSkxQSCIsImhvdGVsSWQiOiIyODg3MCIsImdyb3VwSWQiOiIxODAzNiIsInJlZmVyZW5jZVJhdGVDb2RlIjoiQkFSU0lUIiwiZGlzcGxheU5hbWUiOiJQYXJjLUFuaW1hbGllci1kZXMtUHlyZW5lZXMiLCJuYmYiOjE3NjM0ODAyNzQsImV4cCI6MjUzNDAyMzAwODAwLCJpYXQiOjE3NjM0ODAyNzQsImlzcyI6IkF2YWlscHJvIEFQSSBNYW5hZ2VyIiwiYXVkIjoiZC1lZGdlIn0.2qoyY5Wx2Zw2Oje7LwX0WPQy2BdREyrtIUsJzm9xebLRKgu0-EDg7gdAjsnKg-PXt4wdx8_O6i3apWKOVq-anw",
+  "propertyIndex": 0,
+  "version": "1.35.0",
+  "baseHost": "https://websdk.d-edge.com"
+}

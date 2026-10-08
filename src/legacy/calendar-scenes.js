@@ -1,0 +1,17 @@
+function installCalendarScenes(){
+ const scenes=[
+  {style:'tiles',name:'Immersion · cases pleines',photo:'interior',alt:'Une visiteuse observe les ours depuis La Tanière',logo:'whiteLogo'},
+  {style:'circles',name:'Jardin clair · dates en cercles',photo:'bear',alt:'Portrait d’un ours brun du Parc Animalier des Pyrénées',logo:'logo'},
+  {style:'ruled',name:'Carnet de séjour · lignes fines',photo:'ours',alt:'La baie vitrée de La Tanière ouverte sur les ours',logo:'logo'},
+  {style:'prices',name:'Vert du parc · prix en premier',photo:'bear',alt:'Un ours brun dans son environnement au parc',logo:'whiteLogo'},
+  {style:'nightboard',name:'Bleu nuit · sélection dorée',photo:'bear',alt:'Portrait d’un ours brun',logo:'whiteLogo'},
+  {style:'capsules',name:'Album de lodge · dates en capsules',photo:'interior',alt:'La chambre de La Tanière face aux ours',logo:'logo'},
+  {style:'agenda',name:'Photographie & verre · agenda du mois',photo:'interior',alt:'Vue sur les ours depuis la chambre de La Tanière',logo:'whiteLogo'},
+  {style:'outline',name:'Panorama · prix en étiquettes',photo:'ours',alt:'Panorama de l’habitat des ours depuis La Tanière',logo:'whiteLogo'}
+ ];
+ const stage=document.getElementById('calendar-stage'),dots=document.getElementById('calendar-dots'),photo=document.getElementById('scene-photo'),logo=document.getElementById('scene-logo');let current=0;
+ dots.innerHTML=scenes.map((s,i)=>`<button data-calendar="${i}" aria-label="Calendrier ${i+1} : ${s.name}" aria-current="${i===0}"></button>`).join('');
+ function choose(index){current=(index+scenes.length)%scenes.length;const scene=scenes[current];stage.dataset.calendarStyle=scene.style;photo.src=ASSETS[scene.photo];photo.alt=scene.alt;logo.src=ASSETS[scene.logo];document.getElementById('calendar-count').textContent=`0${current+1} / 08`;document.getElementById('calendar-title').textContent=scene.name;document.getElementById('scene-number').textContent=`0${current+1}`;document.getElementById('calendar-size').textContent=scene.style==='agenda'?'Liste du mois':'La Tanière';stage.setAttribute('aria-label',`Ambiance ${current+1} sur 8 : ${scene.name}`);dots.querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-current',String(i===current)));if(scene.style==='agenda')requestAnimationFrame(()=>{const list=stage.querySelector('.fbw-calendar--month-table-container'),day=stage.querySelector('.chosen_day')||stage.querySelector('.available_day');if(list&&day)list.scrollTop=day.getBoundingClientRect().top-list.getBoundingClientRect().top+list.scrollTop-120;});}
+ document.getElementById('previous-calendar').addEventListener('click',()=>choose(current-1));document.getElementById('next-calendar').addEventListener('click',()=>choose(current+1));dots.addEventListener('click',e=>{const button=e.target.closest('[data-calendar]');if(button)choose(Number(button.dataset.calendar));});stage.addEventListener('keydown',e=>{if(e.target!==stage)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();choose(current+(e.key==='ArrowRight'?1:-1));}});
+ let start=null;stage.addEventListener('touchstart',e=>{start=null;if(e.target.closest('.booking-card,button,a'))return;start={x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:true});stage.addEventListener('touchend',e=>{if(!start)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;if(Math.abs(dx)>65&&Math.abs(dx)>Math.abs(dy)*1.5)choose(current+(dx<0?1:-1));start=null;},{passive:true});choose(0);
+}
