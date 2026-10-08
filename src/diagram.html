@@ -1,0 +1,19 @@
+ <section class="diagram-section" id="schema" aria-label="Fonctionnement du site">
+  <div class="section-marker"><span>01 / Fonctionnement</span><span>Schéma interactif · exemple</span></div>
+  <div class="diagram" id="diagram">
+   <div class="node host"><div class="server-icon" aria-hidden="true"><i></i><i></i><i></i></div><strong id="host-name">Hébergeur actuel</strong><small>Stocke les fichiers du site</small><button id="change-host" aria-pressed="false">Changer d’hébergeur <span>↔</span></button></div>
+   <div class="connector hosting-link"><span>stocké chez</span><i>←</i></div>
+   <div class="node website"><div class="browser-bar"><i></i><i></i><i></i><span>HTTPS</span></div><div class="site-inside"><strong>Site du parc</strong><span class="url">parc-animalier-pyrenees.com <b>✓</b></span><div class="page-stack"><span>/page/… <b>✓</b></span><span>Contenus <b>✓</b></span><span>Liens <b>✓</b></span></div></div></div>
+   <div class="connector booking-link"><span>affiche le calendrier</span><i>←</i></div>
+   <div class="node engine"><span class="engine-icon" aria-hidden="true">▦</span><strong>D-EDGE</strong><small>Dates, prix, réservations</small><span class="node-caption">Outil connecté au site</span></div>
+   <div class="search-branch"><span class="vertical-line">↑</span><div class="search-node"><span class="search-icon" aria-hidden="true">⌕</span><div><strong>Google · recherche</strong><small>Retrouve les mêmes pages</small></div><span class="check">✓</span></div></div>
+   <div class="analytics-branch"><div class="visitor"><strong>Navigateur du visiteur</strong><small>Cookies : préférences, identifiants</small></div><div class="measurement"><button id="consent-switch" role="switch" aria-checked="false"><span class="switch-track"><i></i></span>Mesure d’audience</button><div class="data-line"><span id="data-label">Non autorisée</span><i>→</i></div></div><div class="analytics"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><strong>Google Analytics</strong><small>Statistiques de visite</small></div></div>
+  </div>
+  <div class="diagram-note" id="migration-status" role="status">Essayez les deux commandes pour voir ce qui change.</div>
+  <div class="details-row">
+   <details><summary>Référencement</summary><p>Le domaine, les adresses des pages, les contenus utiles et les liens sont conservés : Google peut retrouver les mêmes pages même si le serveur change. Si une adresse change, une redirection permanente (301) relie l’ancienne à la nouvelle. Vérifier aussi l’indexation et suivre Search Console ; les positions ne sont jamais garanties.</p></details>
+   <details><summary>Prestataire & hébergement</summary><p>L’agence entretient le site ; l’hébergeur le stocke. Ce sont deux rôles différents. Changer d’agence n’oblige pas à changer d’hébergeur ou de D-EDGE. Il faut récupérer les accès, les fichiers, les contenus et les sauvegardes. Pour changer de serveur : copier, tester, puis faire pointer le domaine vers le nouvel hébergement, en conservant HTTPS.</p></details>
+   <details><summary>Cookies & statistiques</summary><p>Un cookie est une petite donnée enregistrée dans le navigateur, pas un envoi à Google en soi. Avec le consentement requis, un outil de mesure peut transmettre des événements de visite à Google Analytics. Les cookies de réservation ont un autre usage. Ici, le bouton est une démonstration : aucun suivi Google Analytics n’est installé.</p></details>
+  </div>
+ </section>
+

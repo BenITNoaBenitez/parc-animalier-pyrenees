@@ -1,0 +1,8 @@
+(() => {
+ function hydrate(scope=document){scope.querySelectorAll('[data-asset]').forEach(el=>{el.src=ASSETS[el.dataset.asset];});}
+ hydrate();
+ const changeHost=document.getElementById('change-host');
+ changeHost.addEventListener('click',()=>{const changed=changeHost.getAttribute('aria-pressed')!=='true';changeHost.setAttribute('aria-pressed',String(changed));document.querySelector('.host').classList.toggle('changed',changed);document.getElementById('host-name').textContent=changed?'Nouvel hébergeur':'Hébergeur actuel';changeHost.innerHTML=changed?'Revenir à l’ancien <span>↔</span>':'Changer d’hébergeur <span>↔</span>';document.getElementById('migration-status').textContent=changed?'Serveur changé. Adresse, pages, contenus et liens inchangés ✓':'Hébergeur initial rétabli. Les pages restent identiques.';});
+ document.getElementById('consent-switch').addEventListener('click',function(){const on=this.getAttribute('aria-checked')!=='true';this.setAttribute('aria-checked',String(on));document.getElementById('diagram').classList.toggle('consented',on);document.getElementById('data-label').textContent=on?'Événements de visite':'Non autorisée';document.getElementById('migration-status').textContent=on?'Illustration : la mesure peut transmettre des événements après autorisation. Aucun suivi réel ici.':'Illustration : la mesure reste désactivée. Le site et la réservation restent indépendants.';});
+
+})();
