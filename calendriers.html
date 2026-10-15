@@ -1,4 +1,4 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Calendriers du parc · sept calendriers, trois designs</title><style>@font-face {
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Calendriers de réservation</title><style>@font-face {
   font-family: 'Barlow Condensed';
   font-style: normal;
   font-weight: 500;
@@ -83,7 +83,7 @@ details{font-size:10px;color:#617278;line-height:1.8}summary{cursor:pointer;font
 </style></head><body><header class="g-head">
  <div class="g-brand"><img data-asset="logo" alt="Parc Animalier des Pyrénées"><span>Prototype BenIT · calendriers relevés sur le site le 15 octobre 2026</span></div>
  <div class="g-intro">
-  <div><span class="eyebrow">Les calendriers du site, à notre charte</span><h1>Sept calendriers, <br>trois designs, clair ou sombre.</h1><p>Chaque calendrier interroge D-EDGE en direct. Choisissez un design et un mode pour tous, ou carte par carte : la balise à copier se met à jour aussitôt. Un clic choisit une nuit et affiche ses deux jours ; un clic plus loin déplace le départ tant que les nuits suivantes sont disponibles. Les séjours à deux nuits minimum sont annoncés dans la case, au-dessus du calendrier et dans le panneau.</p></div>
+  <div><h1>Calendriers de réservation</h1></div>
   <div class="g-tools">
    <div class="g-group"><span class="eyebrow">Design · pour tous</span><div class="seg" data-global="design" role="group" aria-label="Design de tous les calendriers"><button type="button" data-value="cases" aria-pressed="true">Cases pleines</button><button type="button" data-value="cercles" aria-pressed="false">Cercles</button><button type="button" data-value="lignes" aria-pressed="false">Lignes fines</button></div></div>
    <div class="g-group"><span class="eyebrow">Mode · pour tous</span><div class="seg" data-global="theme" role="group" aria-label="Mode de tous les calendriers"><button type="button" data-value="clair" aria-pressed="true">Clair</button><button type="button" data-value="sombre" aria-pressed="false">Sombre</button></div></div>
@@ -216,7 +216,7 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #347
 :host([compact]) .head{display:none}
 .body{padding:18px 22px 22px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.live{font-size:9px;color:var(--muted);white-space:nowrap}.live:before{content:'●';color:var(--accent);font-size:7px;margin-right:5px}
+.live{font-size:9px;color:var(--muted);white-space:nowrap}.live:empty{display:none}.live:before{content:'●';color:var(--accent);font-size:7px;margin-right:5px}
 .occupancy{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:10px;color:var(--muted)}
 .occupancy label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 6px;cursor:pointer}
@@ -477,7 +477,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
       }
       _paintStatus() {
         const today = parisToday(), any = Array.from(this._results.values()).some(v => v.status === 'available' && v.date >= today);
-        this.$('live').textContent = this._loading ? 'Connexion…' : this._failed ? 'Connexion indisponible' : 'D-EDGE · en direct';
+        this.$('live').textContent = this._loading ? 'Connexion…' : this._failed ? 'Connexion indisponible' : '';
         this.$('notice').textContent = this._loading ? '' : this._failed ? 'Les disponibilités ne peuvent pas être chargées. Réessayez ou utilisez le moteur officiel.' : !any ? 'Aucune date disponible pour cette composition sur la période affichée. Essayez le mois suivant ou une autre composition.' : '';
         this.$('retry').hidden = this._loading || !this._failed;
         const mins = Array.from(this._results.values()).filter(v => v.status === 'available' && v.date >= today).map(v => v.nights);

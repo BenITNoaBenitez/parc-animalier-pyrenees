@@ -23,6 +23,6 @@ await fs.writeFile(new URL('index.html', import.meta.url), html);
 // Galerie autonome : les sept calendriers, trois designs, clair ou sombre, avec la balise à copier.
 const galleryAssets = Object.fromEntries(['logo', 'parc', 'interior', 'black', 'trappeur', 'panda', 'grange', 'moulin'].map(key => [key, assets[key]]));
 const galleryJs = `const ASSETS=${JSON.stringify(galleryAssets)};\n` + embed + '\n' + await read('src/gallery.js');
-const gallery = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Calendriers du parc · sept calendriers, trois designs</title><style>${fonts}${await read('src/gallery.css')}</style></head><body>${await read('src/gallery.html')}<script>${galleryJs.replaceAll('</script', '<\\/script')}</script></body></html>`;
+const gallery = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Calendriers de réservation</title><style>${fonts}${await read('src/gallery.css')}</style></head><body>${await read('src/gallery.html')}<script>${galleryJs.replaceAll('</script', '<\\/script')}</script></body></html>`;
 await fs.writeFile(new URL('calendriers.html', import.meta.url), gallery);
 console.log(`index.html autonome : ${Buffer.byteLength(html)} octets · calendriers.html : ${Buffer.byteLength(gallery)} octets · parc-calendrier.js : ${Buffer.byteLength(embed)} octets`);

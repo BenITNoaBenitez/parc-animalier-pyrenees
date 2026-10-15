@@ -116,7 +116,7 @@ button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #347
 :host([compact]) .head{display:none}
 .body{padding:18px 22px 22px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.live{font-size:9px;color:var(--muted);white-space:nowrap}.live:before{content:'●';color:var(--accent);font-size:7px;margin-right:5px}
+.live{font-size:9px;color:var(--muted);white-space:nowrap}.live:empty{display:none}.live:before{content:'●';color:var(--accent);font-size:7px;margin-right:5px}
 .occupancy{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:10px;color:var(--muted)}
 .occupancy label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 6px;cursor:pointer}
@@ -377,7 +377,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
       }
       _paintStatus() {
         const today = parisToday(), any = Array.from(this._results.values()).some(v => v.status === 'available' && v.date >= today);
-        this.$('live').textContent = this._loading ? 'Connexion…' : this._failed ? 'Connexion indisponible' : 'D-EDGE · en direct';
+        this.$('live').textContent = this._loading ? 'Connexion…' : this._failed ? 'Connexion indisponible' : '';
         this.$('notice').textContent = this._loading ? '' : this._failed ? 'Les disponibilités ne peuvent pas être chargées. Réessayez ou utilisez le moteur officiel.' : !any ? 'Aucune date disponible pour cette composition sur la période affichée. Essayez le mois suivant ou une autre composition.' : '';
         this.$('retry').hidden = this._loading || !this._failed;
         const mins = Array.from(this._results.values()).filter(v => v.status === 'available' && v.date >= today).map(v => v.nights);
