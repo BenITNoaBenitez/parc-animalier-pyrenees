@@ -4,6 +4,7 @@
  * Réservation : moteur officiel D-EDGE. Cette balise ne traite ni paiement ni donnée personnelle.
  * Usage : <script src="parc-calendrier.js" defer></script> puis <parc-calendrier logement="taniere"></parc-calendrier>
  * Attributs : logement | chambre, adultes, enfants, ages, mois (1|2), design (cases|cercles|lignes), theme (clair|sombre), photo, titre, sous-titre, compact.
+ * Un clic choisit la nuit du jour cliqué (ce jour → le lendemain, séjour minimum compris) ; la durée se règle avec − et + dans le panneau.
  */
 (function (root) {
   'use strict';
@@ -131,7 +132,6 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 .day.available:hover{background:var(--day-hover);transform:translateY(-2px);border-color:var(--accent)}
 .day.full .cap,.day.closed .cap{color:#9d735e}.day.unknown .cap{color:var(--muted)}.day.past{opacity:.35}
 .day.loading .cap{background:var(--day-bg);border-radius:4px;color:transparent;width:24px;animation:pulse 1.3s ease-in-out infinite}
-.day.can-end{cursor:pointer}.day.can-end:hover{box-shadow:inset 0 0 0 1px var(--accent);transform:none}
 .day.start,.day.end{background:var(--sel-bg)!important;border-color:var(--sel-bg)!important;color:var(--sel-text);transform:none!important;opacity:1}
 .day.start{border-radius:8px 3px 3px 8px}.day.end{border-radius:3px 8px 8px 3px}
 .day.start .cap,.day.end .cap{color:var(--sel-caption)!important;font-weight:600;letter-spacing:.3px}
@@ -145,6 +145,10 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 .pick[hidden]{display:none}.pick{margin-top:16px;padding:16px 18px;border-radius:12px;background:var(--day-bg);border:1px solid var(--day-border);display:grid;gap:9px;animation:reveal .3s ease;outline:none}
 .pick .eyebrow{color:var(--muted);letter-spacing:.8px;font-size:8px;text-transform:none}
 .pick .lodge{font-family:var(--display);font-size:24px;font-weight:500;line-height:1}
+.pick .nights{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}
+.pick .nights strong{font-size:11px;color:var(--ink);min-width:52px;text-align:center}
+.pick .nights button{width:28px;height:28px;border-radius:50%;border:1px solid var(--day-border);background:var(--card);color:var(--ink);font-size:16px;line-height:1}
+.pick .nights button:hover:not(:disabled){border-color:var(--accent)}.pick .nights button:disabled{opacity:.3}
 .pick .price{font-family:var(--display);font-size:32px;line-height:1}.pick .price small{font-family:var(--body);font-size:9px;color:var(--muted);margin-left:7px}
 .pick .book{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:13px 15px;background:var(--accent);color:var(--accent-text);border-radius:7px;font-size:11px;font-weight:600;text-decoration:none;transition:filter .15s}
 .pick .book:hover{filter:brightness(1.06)}
@@ -160,7 +164,6 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 :host([design="cercles"]) .day.available .num{background:var(--day-bg);border-color:var(--day-border)}
 :host([design="cercles"]) .day.available:hover{transform:none}
 :host([design="cercles"]) .day.available:hover .num{background:var(--day-hover);border-color:var(--accent)}
-:host([design="cercles"]) .day.can-end:hover{box-shadow:none}:host([design="cercles"]) .day.can-end:hover .num{border-color:var(--accent)}
 :host([design="cercles"]) .day.start,:host([design="cercles"]) .day.end{color:var(--ink)}
 :host([design="cercles"]) .day.start .num,:host([design="cercles"]) .day.end .num{background:var(--sel-bg);color:var(--sel-text);border-color:var(--sel-bg)}
 :host([design="cercles"]) .day.start .cap,:host([design="cercles"]) .day.end .cap{color:var(--accent-strong)!important}
@@ -178,7 +181,6 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 :host([design="lignes"]) .num{font-family:var(--display);font-size:20px;line-height:1;font-weight:500}
 :host([design="lignes"]) .cap{font-size:8px}
 :host([design="lignes"]) .day.available:hover{transform:none;box-shadow:inset 0 -2px 0 var(--accent)}
-:host([design="lignes"]) .day.can-end:hover{box-shadow:inset 0 -2px 0 var(--accent)}
 :host([design="lignes"]) .day.start,:host([design="lignes"]) .day.end{box-shadow:inset 0 -3px 0 var(--accent);color:var(--ink)}
 :host([design="lignes"]) .day.start .num,:host([design="lignes"]) .day.end .num{color:var(--accent-strong)}
 :host([design="lignes"]) .day.start .cap,:host([design="lignes"]) .day.end .cap{color:var(--accent-strong)!important}
@@ -188,7 +190,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 :host([design="lignes"]) .nav button{border-radius:0;border:0;border-bottom:1px solid var(--line)}
 :host([design="lignes"]) .nav h3{font-family:var(--display);font-size:22px;text-transform:uppercase;letter-spacing:.5px}
 :host([design="lignes"]) .pick{border-radius:0;border:0;border-top:2px solid var(--accent);background:none;padding:16px 0 0}
-:host([design="lignes"]) .pick .book{border-radius:0}
+:host([design="lignes"]) .pick .book{border-radius:0}:host([design="lignes"]) .pick .nights button{border-radius:0}
 :host([design="lignes"]) .retry{border-radius:0}
 @keyframes pulse{50%{opacity:.4}}@keyframes reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @container (max-width:640px){.months{grid-template-columns:1fr}}
@@ -261,7 +263,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         this.$('next').addEventListener('click', () => this._move(1));
         this.$('retry').addEventListener('click', () => this._load(true));
         this.$('months').addEventListener('click', e => {const b = e.target.closest('button[data-date]'); if (b && !b.disabled) this._pick(b.dataset.date);});
-        this.$('pick').addEventListener('click', e => {if (e.target.closest('#clear')) this._clear(true);});
+        this.$('pick').addEventListener('click', e => {if (e.target.closest('#clear')) this._clear(true); else if (e.target.closest('#less')) this._adjust(-1); else if (e.target.closest('#more')) this._adjust(1);});
         this.$('occupancy').addEventListener('change', () => this._readOccupancy());
       }
       _paintHead() {
@@ -318,7 +320,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         const arrival = this._selected;
         if (!arrival) return null;
         const value = this._results.get(arrival), nights = this._nights || (value ? value.nights : 1);
-        return {arrival, nights, departure: addDays(arrival, nights), latest: addDays(arrival, value ? value.maxNights : 31)};
+        return {arrival, nights, departure: addDays(arrival, nights)};
       }
       _cells(month) {
         const today = parisToday(), start = new Date(month + 'T12:00:00Z'), days = Number(monthEnd(month).slice(8)), stay = this._stay();
@@ -328,13 +330,11 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
           const past = date < today, v = this._results.get(date);
           const status = past ? 'past' : this._loading ? 'loading' : v ? v.status : 'unknown';
           const isStart = !!stay && date === stay.arrival, isEnd = !!stay && date === stay.departure, within = !!stay && date > stay.arrival && date < stay.departure;
-          const canEnd = !!stay && !this._loading && date > stay.arrival && date <= stay.latest && !(v && v.noDeparture);
-          const available = status === 'available', active = available || canEnd;
-          const classes = ['day', status, isStart ? 'start' : '', isEnd ? 'end' : '', within ? 'within' : '', canEnd && !isEnd ? 'can-end' : ''].filter(Boolean).join(' ');
+          const available = status === 'available', active = available;
+          const classes = ['day', status, isStart ? 'start' : '', isEnd ? 'end' : '', within ? 'within' : ''].filter(Boolean).join(' ');
           const caption = past ? '' : status === 'loading' ? '…' : isStart ? 'arrivée' : isEnd ? 'départ' : within ? '' : available ? money(v.price) : status === 'unknown' ? '?' : '—';
           const detail = past ? 'date passée' : status === 'loading' ? 'chargement' : isStart ? 'jour d’arrivée choisi' : isEnd ? 'jour de départ' : available ? `dès ${money(v.price)} par nuit${v.nights > 1 ? `, ${v.nights} nuits minimum` : ''}${this._lodge.id ? '' : ', ' + v.room.name}` : status === 'full' ? 'indisponible' : status === 'closed' ? 'arrivée impossible ce jour' : 'disponibilité inconnue';
-          const extra = canEnd && !isEnd ? ', choisir comme jour de départ' : '';
-          html += `<button type="button" class="${classes}" data-date="${date}"${active ? '' : ' disabled'} aria-label="${esc(cap(fmt(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})) + ', ' + detail + extra)}" aria-pressed="${isStart || isEnd}"><span class="num">${day}</span><span class="cap">${caption}</span>${available && !this._lodge.id && !isStart && !isEnd ? `<i class="who" style="background:${v.room.color}" aria-hidden="true"></i>` : ''}</button>`;
+          html += `<button type="button" class="${classes}" data-date="${date}"${active ? '' : ' disabled'} aria-label="${esc(cap(fmt(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})) + ', ' + detail)}" aria-pressed="${isStart || isEnd}"><span class="num">${day}</span><span class="cap">${caption}</span>${available && !this._lodge.id && !isStart && !isEnd ? `<i class="who" style="background:${v.room.color}" aria-hidden="true"></i>` : ''}</button>`;
         }
         return html;
       }
@@ -356,16 +356,14 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         this._selected = null; this._nights = null; this._paintPick(null);
         if (date) {this._paintGrid(); if (focus) {const b = this.shadowRoot.querySelector(`[data-date="${date}"]`); if (b) b.focus({preventScroll: true});}}
       }
-      // Premier clic : l’arrivée, la nuit s’affiche jusqu’au départ minimum. Clic sur un jour suivant : le départ se déplace.
-      _pick(date) {
-        const stay = this._stay(), v = this._results.get(date);
-        if (stay && date > stay.arrival && date <= stay.latest && !(v && v.noDeparture)) {
-          const arrival = this._results.get(stay.arrival), nights = nightsBetween(stay.arrival, date);
-          if (!arrival || nights < arrival.nights) {this._paintPick(arrival, `Séjour minimum de ${plural(arrival ? arrival.nights : 1, 'nuit')} pour cette date d’arrivée.`); return;}
-          this._nights = nights; this._paintGrid(); this._paintPick(arrival, 'Départ modifié. Le tarif total est confirmé sur le moteur officiel.'); this._emit();
-          return;
-        }
-        if (v && v.status === 'available') this._select(date);
+      // Un clic choisit la nuit du jour cliqué : ce jour et le lendemain, séjour minimum compris. La durée se règle ensuite avec − et +.
+      _pick(date) {const v = this._results.get(date); if (v && v.status === 'available') this._select(date);}
+      _adjust(step) {
+        const value = this._selected && this._results.get(this._selected);
+        if (!value || value.status !== 'available') return;
+        const nights = Math.min(value.maxNights, Math.max(value.nights, (this._nights || value.nights) + step));
+        if (nights === this._nights) return;
+        this._nights = nights; this._paintGrid(); this._paintPick(value, 'Durée modifiée. Le tarif total est confirmé sur le moteur officiel.'); this._emit();
       }
       _select(date) {
         const value = this._results.get(date);
@@ -390,13 +388,14 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         const o = this._occ, available = value.status === 'available', nights = this._nights || value.nights;
         const who = `${plural(o.adults, 'adulte')}${o.children ? `, ${plural(o.children, 'enfant')}` : ''}`;
         const stay = `${plural(nights, 'nuit')}${value.nights > 1 ? ` · minimum ${value.nights}` : ''}`;
+        const stepper = available ? `<div class="nights" role="group" aria-label="Durée du séjour"><span>Durée</span><button type="button" id="less" aria-label="Une nuit de moins"${nights <= value.nights ? ' disabled' : ''}>−</button><strong aria-live="polite">${plural(nights, 'nuit')}</strong><button type="button" id="more" aria-label="Une nuit de plus"${nights >= value.maxNights ? ' disabled' : ''}>+</button></div>` : '';
         const short = d => cap(fmt(d, {weekday: 'short', day: 'numeric', month: 'long'}));
         el.hidden = false;
         el.innerHTML = `<span class="eyebrow">${short(value.date)} → ${short(addDays(value.date, nights))} · ${stay} · ${who}</span>` +
-          (this._lodge.id ? '' : `<span class="lodge">${esc(value.room.name)}</span>`) +
+          (this._lodge.id ? '' : `<span class="lodge">${esc(value.room.name)}</span>`) + stepper +
           (available ? `<span class="price">${money(value.price)}<small>par nuit · dès</small></span><a class="book" href="${bookingUrl(value, o, true, nights)}" target="_blank" rel="noopener">Réserver ${plural(nights, 'nuit')} sur le moteur officiel <span>↗</span></a>` : `<span class="price">Indisponible</span><a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
           (this._lodge.id || !available ? '' : `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`) +
-          `<span class="hint">${esc(hint || '')}${available ? ' Un clic sur un jour suivant déplace la date de départ.' : ''}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
+          `<span class="hint">${esc(hint || '')}${available && value.maxNights > value.nights ? ' La durée se règle avec − et +, ou sur le moteur officiel.' : ''}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
         this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
       }
     }

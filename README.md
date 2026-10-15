@@ -64,7 +64,7 @@ La balise émet l’événement `parc-calendrier:selection` (détail : date, dé
 ### Comportement
 
 - Tarif « dès » par nuit pour la composition choisie, revérifié au clic sur une date.
-- La nuit s’affiche sur deux jours, de l’arrivée au départ ; un clic sur un jour suivant déplace le départ, dans la limite du séjour maximum. Le total du séjour est confirmé sur le moteur officiel.
+- La nuit s’affiche sur deux jours, de l’arrivée au départ : un clic choisit la nuit du jour cliqué. Les boutons − et + du panneau règlent la durée, dans la limite du séjour maximum. Le total du séjour est confirmé sur le moteur officiel.
 - Les gîtes imposent un séjour minimum : la date de départ et le lien de réservation en tiennent compte.
 - Le lien « Réserver » ouvre le moteur officiel avec logement, dates et voyageurs préremplis ; le prix final et les conditions y sont confirmés.
 - Un service qui ne répond pas n’est jamais affiché comme complet ; un bouton permet de réessayer.
