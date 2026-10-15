@@ -43,7 +43,7 @@
     }
     $('month-grid').innerHTML=html;
     const incomplete=C.rooms.some(room=>!results.has(room.id))||Array.from({length:end.getUTCDate()},(_,i)=>month.slice(0,8)+String(i+1).padStart(2,'0')).some(date=>date>=today&&C.combine(date,results).unknown);
-    $('live-status').textContent=loading?'Connexion…':!results.size?'Connexion indisponible':incomplete?'Données partielles':'D-EDGE · en direct';
+    $('live-status').textContent=loading?'Connexion…':!results.size?'Connexion indisponible':incomplete?'Données partielles':'';
     $('calendar-notice').textContent=loading?'':results.size===0?'Les disponibilités ne peuvent pas être chargées. Réessayez ou consultez le moteur officiel.':incomplete?'Certaines disponibilités restent à vérifier. Les dates proposées sont celles confirmées par les logements qui ont répondu.':!$('month-grid').querySelector('.available')?'Aucune nuit disponible dans cette configuration ce mois-ci. Consultez le mois suivant.':'';
     $('retry').hidden=loading||!incomplete;
   }
