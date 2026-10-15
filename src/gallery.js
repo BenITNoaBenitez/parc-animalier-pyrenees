@@ -4,7 +4,7 @@
  const FALLBACK='  <a href="https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/">Réserver sur le moteur officiel</a>';
  // Les sept calendriers relevés sur le site le 15 octobre 2026, avec les limites de voyageurs de chaque widget officiel.
  const CALENDARS=[
-  {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},photo:'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Page Hébergements · widget D-EDGE sans filtre : meilleur prix par date · jusqu’à 10 adultes et 10 enfants'},
+  {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},photo:'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Page Hébergements · les quatre nuits insolites : meilleur prix par date · jusqu’à 5 adultes et 4 enfants (le widget du site, lui, mélange lodges et gîtes)'},
   {logement:'taniere',asset:'interior',photo:'033817taniere.jpg',note:'Widget D-EDGE · logement 140910 · 2 adultes, 1 enfant maximum'},
   {logement:'refuge',asset:'black',photo:'042005ecolodge_le_refuge_pap-19.jpg',note:'Widget D-EDGE · logement 140908 · 5 adultes, 4 enfants maximum'},
   {logement:'trappeur',asset:'trappeur',photo:'115802trappeur.jpg',note:'Widget D-EDGE · logement 140907 · 4 adultes, 3 enfants maximum · réservations ouvertes à partir de février 2027'},

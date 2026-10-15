@@ -26,7 +26,7 @@ Relevé du 15 octobre 2026 sur parc-animalier-pyrenees.com : sept pages embarque
 
 | Page du site | Calendrier | Identifiant D-EDGE | Voyageurs max. (widget officiel) |
 |---|---|---|---|
-| `/page/hebergements` | Vue d’ensemble, tous hébergements | aucun filtre | 10 adultes, 10 enfants |
+| `/page/hebergements` | Vue d’ensemble (le widget du site mélange lodges et gîtes ; la balise `tous` se limite aux quatre lodges) | aucun filtre | 10 adultes, 10 enfants |
 | `/page/dormir-avec-les-ours-bruns` | La Tanière | 140910 | 2 adultes, 1 enfant |
 | `/page/dormir-avec-les-loups-noirs` | Le Refuge | 140908 | 5 adultes, 4 enfants |
 | `/page/nuits-insolites` | La Cabane du Trappeur | 140907 | 4 adultes, 3 enfants |
@@ -50,7 +50,7 @@ La quatrième partie du prototype affiche ces sept calendriers dans la charte du
 
 | Attribut | Valeurs | Rôle |
 |---|---|---|
-| `logement` | `tous`, `taniere`, `refuge`, `trappeur`, `asian`, `grange`, `moulin` | Calendrier à afficher (`tous` par défaut). |
+| `logement` | `tous`, `taniere`, `refuge`, `trappeur`, `asian`, `grange`, `moulin` | Calendrier à afficher (`tous` par défaut : les quatre lodges, meilleur prix par date). |
 | `chambre` | identifiant D-EDGE, ex. `140910` | Alternative à `logement`. |
 | `adultes`, `enfants`, `ages` | nombres, âges séparés par des virgules | Composition de départ ; le visiteur la modifie dans les limites du logement. |
 | `mois` | `1` ou `2` | Nombre de mois affichés côte à côte. |
@@ -68,7 +68,7 @@ La balise émet l’événement `parc-calendrier:selection` (détail : date, dé
 - Les gîtes imposent un séjour minimum : la date de départ et le lien de réservation en tiennent compte.
 - Le lien « Réserver » ouvre le moteur officiel avec logement, dates et voyageurs préremplis ; le prix final et les conditions y sont confirmés.
 - Un service qui ne répond pas n’est jamais affiché comme complet ; un bouton permet de réessayer.
-- La vue d’ensemble (`tous`) affiche le meilleur prix par date et le logement correspondant.
+- La vue d’ensemble (`tous`) affiche le meilleur prix par date parmi les quatre lodges, La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge, et le logement correspondant. Les gîtes ont leurs propres calendriers.
 
 ## Développement
 

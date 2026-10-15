@@ -321,7 +321,7 @@
   </div>
   <div class="embed-grid" id="embed-grid"></div>
   <div class="embed-docs">
-   <details><summary>Attributs de la balise</summary><p><code>logement</code> : <code>tous</code>, <code>taniere</code>, <code>refuge</code>, <code>trappeur</code>, <code>asian</code>, <code>grange</code> ou <code>moulin</code> ; ou <code>chambre="140910"</code> avec l’identifiant D-EDGE. <code>adultes</code>, <code>enfants</code>, <code>ages</code> : composition de départ, que le visiteur modifie dans les limites fixées pour chaque logement sur le site. <code>mois="2"</code> : deux mois côte à côte. <code>photo</code>, <code>titre</code>, <code>sous-titre</code> : en-tête. <code>design</code> : <code>cases</code>, <code>cercles</code> ou <code>lignes</code>. <code>theme="sombre"</code> : fond bleu nuit, sélection dorée. <code>compact</code> : sans en-tête.</p></details>
+   <details><summary>Attributs de la balise</summary><p><code>logement</code> : <code>tous</code> (les quatre lodges), <code>taniere</code>, <code>refuge</code>, <code>trappeur</code>, <code>asian</code>, <code>grange</code> ou <code>moulin</code> ; ou <code>chambre="140910"</code> avec l’identifiant D-EDGE. <code>adultes</code>, <code>enfants</code>, <code>ages</code> : composition de départ, que le visiteur modifie dans les limites fixées pour chaque logement sur le site. <code>mois="2"</code> : deux mois côte à côte. <code>photo</code>, <code>titre</code>, <code>sous-titre</code> : en-tête. <code>design</code> : <code>cases</code>, <code>cercles</code> ou <code>lignes</code>. <code>theme="sombre"</code> : fond bleu nuit, sélection dorée. <code>compact</code> : sans en-tête.</p></details>
    <details><summary>Ce que fait la balise</summary><p>Elle interroge le même service public D-EDGE que les widgets du site, avec le jeton public déjà exposé sur les pages officielles. Elle affiche le tarif « dès » par nuit pour la composition choisie, affiche la nuit choisie sur ses deux jours, annonce le séjour minimum, laisse déplacer le départ sur les nuits suivantes disponibles, revérifie la date, puis envoie vers le moteur officiel avec le logement, les dates, le séjour minimum et les voyageurs préremplis. Aucun paiement ni donnée personnelle ne transite par la balise. Un service qui ne répond pas n’est jamais affiché comme complet. Un événement <code>parc-calendrier:selection</code> est émis à chaque date choisie, pour la mesure d’audience si elle est autorisée.</p></details>
    <details><summary>Limites &amp; mise en production</summary><p>Le prototype dépend de la disponibilité du service D-EDGE, de son jeton public et de ses règles CORS : D-EDGE doit valider cette intégration avant un usage commercial. L’âge des enfants influence le tarif, la balise le demande comme le widget officiel. Les gîtes imposent un séjour minimum, affiché avec la date de départ correspondante. Le prix final et les conditions sont toujours confirmés sur le moteur officiel.</p></details>
   </div>
@@ -565,7 +565,7 @@
   const FONTS = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap';
   const CHILD_MAX_AGE = 12;
   const LODGES = {
-    tous: {key: 'tous', id: null, name: 'Tous les hébergements', eyebrow: 'Nuits insolites & gîtes d’exception', tagline: 'Le meilleur tarif par date, tous hébergements confondus', page: 'hebergements', adults: 10, children: 10, color: '#91ab2a'},
+    tous: {key: 'tous', id: null, ids: [140910, 140908, 140907, 163456], name: 'Les quatre lodges', eyebrow: 'Nuits insolites · vue d’ensemble', tagline: 'Le meilleur tarif par date parmi La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge', page: 'hebergements', adults: 5, children: 4, color: '#91ab2a'},
     taniere: {key: 'taniere', id: 140910, name: 'La Tanière', eyebrow: 'Dormir avec les ours bruns', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-ours-bruns', adults: 2, children: 1, color: '#a77c4c'},
     refuge: {key: 'refuge', id: 140908, name: 'Le Refuge', eyebrow: 'Dormir avec les loups noirs', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-loups-noirs', adults: 5, children: 4, color: '#34575e'},
     trappeur: {key: 'trappeur', id: 140907, name: 'La Cabane du Trappeur', eyebrow: 'Dormir avec les loups gris', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'nuits-insolites', adults: 4, children: 3, color: '#8c9c60'},
@@ -596,19 +596,21 @@
   function apiUrl(lodge, from, to, occ) {
     const url = new URL(API);
     const params = Object.assign({}, CONFIG, {fromDate: from, toDate: to, adults: String(occ.adults), behavior: 'lowerMinstay', currency: 'EUR', locale: 'fr_FR', output: 'json', s: '1', version: '0.0.1', hotelCurrency: 'EUR'});
-    if (lodge.id) params.roomIds = String(lodge.id);
+    if (lodge.ids) params.roomIds = lodge.ids.join(','); else if (lodge.id) params.roomIds = String(lodge.id);
     if (occ.children > 0) {params.children = String(occ.children); params.childrenAges = occ.ages.join(',');}
     url.search = new URLSearchParams(params);
     return url.href;
   }
   // Une ligne par date d’arrivée : tarif « dès » par nuit, séjour minimum et maximum, logement. Un service muet ne devient jamais « complet ».
-  function normalize(payload, roomId) {
+  // `rooms` : un identifiant, une liste d’identifiants, ou rien pour tout accepter.
+  function normalize(payload, rooms) {
     if (!payload || payload.error || !payload.data || payload.data.code !== 200 || !Array.isArray(payload.data.data)) throw new Error('Réponse D-EDGE non reconnue');
+    const allowed = Array.isArray(rooms) ? rooms.map(Number) : rooms ? [Number(rooms)] : null;
     const map = new Map();
     for (const row of payload.data.data) {
       const date = row.bookingParams && row.bookingParams.from, r = row.restrictions;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '') || !r) continue;
-      if (roomId && Number(row.room) !== Number(roomId)) continue;
+      if (allowed && !allowed.includes(Number(row.room))) continue;
       const room = byId(row.room) || {key: 'autre', id: Number(row.room), name: 'Hébergement ' + row.room, page: 'hebergements', color: '#91ab2a'};
       const nights = Math.max(1, Number(r.minstay) || 1);
       const perNight = Number(row.pricePerNight) || Number(row.totalPrice) / Math.max(1, Number(row.nights) || 1);
@@ -636,7 +638,7 @@
     try {
       const response = await fetch(apiUrl(lodge, from, to, occ), {signal: timeout.signal, credentials: 'omit'});
       if (!response.ok) throw new Error('D-EDGE indisponible');
-      return normalize(await response.json(), lodge.id);
+      return normalize(await response.json(), lodge.ids || lodge.id);
     } finally {clearTimeout(timer); if (signal) signal.removeEventListener('abort', abort);}
   }
   function ensureFonts() {
@@ -1002,7 +1004,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
  const SITE='https://www.parc-animalier-pyrenees.com/', MEDIA=SITE+'medias_front/pages/';
  // Les sept calendriers relevés sur le site le 15 octobre 2026 : page, identifiant D-EDGE et limites de voyageurs du widget officiel.
  const CALENDARS=[
-  {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},page:'hebergements',photo:MEDIA+'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Widget D-EDGE sans filtre : meilleur prix par date · jusqu’à 10 adultes et 10 enfants'},
+  {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},page:'hebergements',photo:MEDIA+'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Les quatre nuits insolites : meilleur prix par date · jusqu’à 5 adultes et 4 enfants (le widget du site mélange lodges et gîtes)'},
   {logement:'taniere',asset:'interior',page:'dormir-avec-les-ours-bruns',photo:MEDIA+'033817taniere.jpg',note:'Widget D-EDGE · logement 140910 · 2 adultes, 1 enfant maximum'},
   {logement:'refuge',asset:'black',page:'dormir-avec-les-loups-noirs',photo:MEDIA+'042005ecolodge_le_refuge_pap-19.jpg',note:'Widget D-EDGE · logement 140908 · 5 adultes, 4 enfants maximum'},
   {logement:'trappeur',asset:'trappeur',page:'nuits-insolites',photo:MEDIA+'115802trappeur.jpg',note:'Widget D-EDGE · logement 140907 · 4 adultes, 3 enfants maximum · réservations ouvertes à partir de février 2027'},

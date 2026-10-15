@@ -2,7 +2,7 @@
  const SITE='https://www.parc-animalier-pyrenees.com/', MEDIA=SITE+'medias_front/pages/';
  // Les sept calendriers relevés sur le site le 15 octobre 2026 : page, identifiant D-EDGE et limites de voyageurs du widget officiel.
  const CALENDARS=[
-  {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},page:'hebergements',photo:MEDIA+'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Widget D-EDGE sans filtre : meilleur prix par date · jusqu’à 10 adultes et 10 enfants'},
+  {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},page:'hebergements',photo:MEDIA+'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Les quatre nuits insolites : meilleur prix par date · jusqu’à 5 adultes et 4 enfants (le widget du site mélange lodges et gîtes)'},
   {logement:'taniere',asset:'interior',page:'dormir-avec-les-ours-bruns',photo:MEDIA+'033817taniere.jpg',note:'Widget D-EDGE · logement 140910 · 2 adultes, 1 enfant maximum'},
   {logement:'refuge',asset:'black',page:'dormir-avec-les-loups-noirs',photo:MEDIA+'042005ecolodge_le_refuge_pap-19.jpg',note:'Widget D-EDGE · logement 140908 · 5 adultes, 4 enfants maximum'},
   {logement:'trappeur',asset:'trappeur',page:'nuits-insolites',photo:MEDIA+'115802trappeur.jpg',note:'Widget D-EDGE · logement 140907 · 4 adultes, 3 enfants maximum · réservations ouvertes à partir de février 2027'},

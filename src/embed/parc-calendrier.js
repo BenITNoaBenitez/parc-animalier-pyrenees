@@ -16,7 +16,7 @@
   const FONTS = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap';
   const CHILD_MAX_AGE = 12;
   const LODGES = {
-    tous: {key: 'tous', id: null, name: 'Tous les hébergements', eyebrow: 'Nuits insolites & gîtes d’exception', tagline: 'Le meilleur tarif par date, tous hébergements confondus', page: 'hebergements', adults: 10, children: 10, color: '#91ab2a'},
+    tous: {key: 'tous', id: null, ids: [140910, 140908, 140907, 163456], name: 'Les quatre lodges', eyebrow: 'Nuits insolites · vue d’ensemble', tagline: 'Le meilleur tarif par date parmi La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge', page: 'hebergements', adults: 5, children: 4, color: '#91ab2a'},
     taniere: {key: 'taniere', id: 140910, name: 'La Tanière', eyebrow: 'Dormir avec les ours bruns', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-ours-bruns', adults: 2, children: 1, color: '#a77c4c'},
     refuge: {key: 'refuge', id: 140908, name: 'Le Refuge', eyebrow: 'Dormir avec les loups noirs', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-loups-noirs', adults: 5, children: 4, color: '#34575e'},
     trappeur: {key: 'trappeur', id: 140907, name: 'La Cabane du Trappeur', eyebrow: 'Dormir avec les loups gris', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'nuits-insolites', adults: 4, children: 3, color: '#8c9c60'},
@@ -47,19 +47,21 @@
   function apiUrl(lodge, from, to, occ) {
     const url = new URL(API);
     const params = Object.assign({}, CONFIG, {fromDate: from, toDate: to, adults: String(occ.adults), behavior: 'lowerMinstay', currency: 'EUR', locale: 'fr_FR', output: 'json', s: '1', version: '0.0.1', hotelCurrency: 'EUR'});
-    if (lodge.id) params.roomIds = String(lodge.id);
+    if (lodge.ids) params.roomIds = lodge.ids.join(','); else if (lodge.id) params.roomIds = String(lodge.id);
     if (occ.children > 0) {params.children = String(occ.children); params.childrenAges = occ.ages.join(',');}
     url.search = new URLSearchParams(params);
     return url.href;
   }
   // Une ligne par date d’arrivée : tarif « dès » par nuit, séjour minimum et maximum, logement. Un service muet ne devient jamais « complet ».
-  function normalize(payload, roomId) {
+  // `rooms` : un identifiant, une liste d’identifiants, ou rien pour tout accepter.
+  function normalize(payload, rooms) {
     if (!payload || payload.error || !payload.data || payload.data.code !== 200 || !Array.isArray(payload.data.data)) throw new Error('Réponse D-EDGE non reconnue');
+    const allowed = Array.isArray(rooms) ? rooms.map(Number) : rooms ? [Number(rooms)] : null;
     const map = new Map();
     for (const row of payload.data.data) {
       const date = row.bookingParams && row.bookingParams.from, r = row.restrictions;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '') || !r) continue;
-      if (roomId && Number(row.room) !== Number(roomId)) continue;
+      if (allowed && !allowed.includes(Number(row.room))) continue;
       const room = byId(row.room) || {key: 'autre', id: Number(row.room), name: 'Hébergement ' + row.room, page: 'hebergements', color: '#91ab2a'};
       const nights = Math.max(1, Number(r.minstay) || 1);
       const perNight = Number(row.pricePerNight) || Number(row.totalPrice) / Math.max(1, Number(row.nights) || 1);
@@ -87,7 +89,7 @@
     try {
       const response = await fetch(apiUrl(lodge, from, to, occ), {signal: timeout.signal, credentials: 'omit'});
       if (!response.ok) throw new Error('D-EDGE indisponible');
-      return normalize(await response.json(), lodge.id);
+      return normalize(await response.json(), lodge.ids || lodge.id);
     } finally {clearTimeout(timer); if (signal) signal.removeEventListener('abort', abort);}
   }
   function ensureFonts() {
