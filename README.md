@@ -38,13 +38,15 @@ La quatrième partie du prototype affiche ces sept calendriers dans la charte du
 
 ### Installation sur une page
 
+<!-- install:start -->
 ```html
-<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier.js" defer></script>
+<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.0.js" integrity="sha384-DCym7u9MU4M+5cwrH6/OtBoqssRnxd8q1U3Bx5DbEqOnN8ztkGW4LZ8CiU52Rzbl" crossorigin="anonymous" defer></script>
 
 <parc-calendrier logement="taniere"></parc-calendrier>
 ```
+<!-- install:end -->
 
-`parc-calendrier.js` est généré par `node build.mjs` à la racine du dépôt et publié par GitHub Pages. Il ne dépend d’aucune bibliothèque ; les polices Google sont chargées seulement si la page ne les déclare pas déjà.
+Le script est publié sous un nom versionné (`parc-calendrier-1.0.0.js`) qui ne change jamais une fois en ligne, avec son empreinte d’intégrité (`integrity`) : le navigateur refuse d’exécuter un fichier qui ne correspond pas exactement. Toute modification de la balise passe par une nouvelle version dans `build.mjs`, un nouveau fichier et une nouvelle empreinte ; les balises déjà copiées continuent de fonctionner avec l’ancienne version. `parc-calendrier.js` sans numéro reste la dernière version, sans empreinte, pour les essais. Hébergement temporaire sur GitHub Pages : pour la mise en ligne définitive, copier le fichier versionné sur le domaine du parc et adapter l’adresse. Aucune bibliothèque requise ; les polices Google sont chargées seulement si la page ne les déclare pas déjà.
 
 ### Attributs
 
@@ -79,10 +81,10 @@ node build.mjs
 node --test tests/calendar.test.cjs tests/embed.test.cjs
 ```
 
-La construction produit deux HTML autonomes, `index.html` et `calendriers.html`, et le fichier `parc-calendrier.js`. Le jeton dans `src/widget-config.json` est celui du widget public embarqué sur les pages officielles, déjà exposé aux navigateurs ; il ne donne pas accès à l’administration. Cette intégration dépend de la disponibilité du service D-EDGE, de ce jeton et de ses règles CORS. Pour une mise en production commerciale, faire valider l’intégration et la pérennité de cet accès par D-EDGE. Le moteur officiel confirme toujours le prix et les conditions.
+La construction produit deux HTML autonomes, `index.html` et `calendriers.html`, le fichier versionné `parc-calendrier-<version>.js` avec son empreinte, et `parc-calendrier.js` (dernière version). Elle refuse d’écraser un fichier versionné déjà publié avec un contenu différent. Le jeton dans `src/widget-config.json` est celui du widget public embarqué sur les pages officielles, déjà exposé aux navigateurs ; il ne donne pas accès à l’administration. Cette intégration dépend de la disponibilité du service D-EDGE, de ce jeton et de ses règles CORS. Pour une mise en production commerciale, faire valider l’intégration et la pérennité de cet accès par D-EDGE. Le moteur officiel confirme toujours le prix et les conditions.
 
 ## Publication
 
-GitHub Pages publie la racine de la branche `main`. Une modification de `index.html`, `calendriers.html` ou `parc-calendrier.js` poussée sur cette branche déclenche la mise à jour du site.
+GitHub Pages publie la racine de la branche `main`. Une modification de `index.html`, `calendriers.html` ou des fichiers `parc-calendrier*.js` poussée sur cette branche déclenche la mise à jour du site.
 
 Le fichier peut aussi être ouvert directement dans un navigateur en local.

@@ -1,6 +1,7 @@
 (() => {
  const SITE='https://www.parc-animalier-pyrenees.com/', MEDIA=SITE+'medias_front/pages/', L=parcCalendrier.LODGES;
- const SCRIPT='<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier.js" defer><\/script>';
+ const SCRIPT=EMBED_SCRIPT_TAG;
+ document.querySelector('.install code').textContent=SCRIPT;
  const FALLBACK='  <a href="https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/">Réserver sur le moteur officiel</a>';
  // Les sept calendriers relevés sur le site le 15 octobre 2026, avec les limites de voyageurs de chaque widget officiel.
  const CALENDARS=[
