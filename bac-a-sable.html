@@ -68,7 +68,7 @@ iframe{display:block;border:1px dashed #d5dccd;border-radius:8px;width:100%;max-
   store.set(html);
  }
  function fit() {
-  try {const doc = frame.contentDocument; if (doc && doc.documentElement) frame.style.setProperty('--h', Math.max(300, doc.documentElement.scrollHeight + 24) + 'px');} catch (e) {}
+  try {const body = frame.contentDocument && frame.contentDocument.body; if (body) frame.style.setProperty('--h', Math.max(300, body.offsetHeight + 34) + 'px');} catch (e) {}
  }
  code.addEventListener('input', () => {clearTimeout(timer); timer = setTimeout(render, 350);});
  code.addEventListener('keydown', e => {if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {e.preventDefault(); clearTimeout(timer); render();}});
