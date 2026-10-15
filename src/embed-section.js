@@ -7,7 +7,7 @@
   {logement:'refuge',asset:'black',page:'dormir-avec-les-loups-noirs',photo:MEDIA+'042005ecolodge_le_refuge_pap-19.jpg',note:'Widget D-EDGE · logement 140908 · 5 adultes, 4 enfants maximum'},
   {logement:'trappeur',asset:'trappeur',page:'nuits-insolites',photo:MEDIA+'115802trappeur.jpg',note:'Widget D-EDGE · logement 140907 · 4 adultes, 3 enfants maximum · réservations ouvertes à partir de février 2027'},
   {logement:'asian',asset:'panda',page:'dormir-avec-les-pandas-roux',photo:MEDIA+'011910shutterstock_32201191.jpg',note:'Widget D-EDGE · logement 163456 · 5 adultes, 4 enfants maximum'},
-  {logement:'grange',asset:'grange',attrs:{adultes:'4',theme:'nuit'},page:'la-grange',photo:MEDIA+'115115la_grange_parc_animalier_des_pyrenees-33.jpg',note:'Widget D-EDGE · gîte 140905 · 10 adultes, 9 enfants maximum · 2 nuits minimum'},
+  {logement:'grange',asset:'grange',attrs:{adultes:'4',theme:'sombre'},page:'la-grange',photo:MEDIA+'115115la_grange_parc_animalier_des_pyrenees-33.jpg',note:'Widget D-EDGE · gîte 140905 · 10 adultes, 9 enfants maximum · 2 nuits minimum'},
   {logement:'moulin',asset:'moulin',page:'le-moulin',photo:MEDIA+'114008le_moulin_parc_animalier_des_pyrenees-21.jpg',note:'Widget D-EDGE · gîte 140906 · 5 adultes, 4 enfants maximum'}
  ];
  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');

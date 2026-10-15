@@ -3,6 +3,7 @@
  * Données : service public du widget D-EDGE, avec le jeton public déjà exposé sur les pages officielles.
  * Réservation : moteur officiel D-EDGE. Cette balise ne traite ni paiement ni donnée personnelle.
  * Usage : <script src="parc-calendrier.js" defer></script> puis <parc-calendrier logement="taniere"></parc-calendrier>
+ * Attributs : logement | chambre, adultes, enfants, ages, mois (1|2), design (cases|cercles|lignes), theme (clair|sombre), photo, titre, sous-titre, compact.
  */
 (function (root) {
   'use strict';
@@ -24,6 +25,7 @@
   const byId = id => Object.values(LODGES).find(l => l.id === Number(id)) || null;
   const iso = d => d.toISOString().slice(0, 10);
   const addDays = (date, n) => iso(new Date(Date.parse(date + 'T12:00:00Z') + n * 86400000));
+  const nightsBetween = (from, to) => Math.round((Date.parse(to + 'T12:00:00Z') - Date.parse(from + 'T12:00:00Z')) / 86400000);
   const parisToday = () => new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
   const monthStart = date => date.slice(0, 7) + '-01';
   const monthEnd = month => {const d = new Date(month + 'T12:00:00Z'); return iso(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0, 12)));};
@@ -32,6 +34,7 @@
   const fmt = (date, opts) => new Intl.DateTimeFormat('fr-FR', Object.assign({}, opts, {timeZone: 'UTC'})).format(new Date(date + 'T12:00:00Z'));
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+  const plural = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
 
   function clampOccupancy(lodge, occ) {
     const adults = Math.min(lodge.adults, Math.max(1, Number(occ.adults) || 1));
@@ -47,7 +50,7 @@
     url.search = new URLSearchParams(params);
     return url.href;
   }
-  // Une ligne par date d’arrivée : tarif « dès » par nuit, séjour minimum, logement. Un service muet ne devient jamais « complet ».
+  // Une ligne par date d’arrivée : tarif « dès » par nuit, séjour minimum et maximum, logement. Un service muet ne devient jamais « complet ».
   function normalize(payload, roomId) {
     if (!payload || payload.error || !payload.data || payload.data.code !== 200 || !Array.isArray(payload.data.data)) throw new Error('Réponse D-EDGE non reconnue');
     const map = new Map();
@@ -60,15 +63,16 @@
       const perNight = Number(row.pricePerNight) || Number(row.totalPrice) / Math.max(1, Number(row.nights) || 1);
       const available = r.status === 'Available' && Number(row.lowestRoomAvailability) > 0 && !r.closedOnArrival && perNight > 0 && row.currency === 'EUR';
       const status = available ? 'available' : r.closedOnArrival ? 'closed' : r.status === 'NotAvailable' ? 'full' : 'unknown';
-      const value = {date, status, price: available ? perNight : null, nights, room, rate: row.rate};
+      const value = {date, status, price: available ? perNight : null, nights, maxNights: Math.max(nights, Number(r.maxstay) || 31), noDeparture: !!r.closedOnDeparture, room, rate: row.rate};
       const prior = map.get(date);
       if (!prior || (available && (prior.status !== 'available' || value.price < prior.price))) map.set(date, value);
     }
     return map;
   }
-  function bookingUrl(offer, occ, filterRoom) {
+  function bookingUrl(offer, occ, filterRoom, nights) {
+    const stay = Math.max(1, Number(nights) || offer.nights || 1);
     const url = new URL(ENGINE);
-    const params = {arrivalDate: offer.date, departureDate: addDays(offer.date, offer.nights), language: 'fr-FR', selectedAdultCount: String(occ.adults), currency: 'EUR'};
+    const params = {arrivalDate: offer.date, departureDate: addDays(offer.date, stay), language: 'fr-FR', selectedAdultCount: String(occ.adults), currency: 'EUR'};
     if (occ.children > 0) params.selectedChildCount = String(occ.children);
     if (filterRoom !== false && offer.room && offer.room.id) {params.roomAction = 'filter'; params.roomId = String(offer.room.id);}
     url.search = new URLSearchParams(params);
@@ -93,9 +97,9 @@
   }
 
   const STYLE = `
-:host{--green:#91ab2a;--navy:#00212d;--pale:#edf1dc;--gold:#e0b755;--ink:#07242d;--muted:#738083;--line:#e6eaea;--card:#fff;--day-bg:#f0f4e1;--day-border:#e6edcf;--day-hover:#e3edc1;--day-text:#607719;--sel-bg:#00212d;--sel-text:#fff;--sel-caption:#e2edb9;--accent:#91ab2a;--accent-text:#172900;--body:'DM Sans',system-ui,sans-serif;--display:'Barlow Condensed','Arial Narrow',sans-serif;--months:1;display:block;font-family:var(--body);font-size:13px;line-height:1.4;color:var(--ink);background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #00212d12;container-type:inline-size;text-align:left}
+:host{--green:#91ab2a;--navy:#00212d;--pale:#edf1dc;--gold:#e0b755;--ink:#07242d;--muted:#738083;--line:#e6eaea;--card:#fff;--day-bg:#f0f4e1;--day-border:#e6edcf;--day-hover:#e3edc1;--day-text:#607719;--sel-bg:#00212d;--sel-text:#fff;--sel-caption:#e2edb9;--within-bg:#dfe8c0;--accent:#91ab2a;--accent-strong:#5c7414;--accent-text:#172900;--body:'DM Sans',system-ui,sans-serif;--display:'Barlow Condensed','Arial Narrow',sans-serif;--months:1;display:block;font-family:var(--body);font-size:13px;line-height:1.4;color:var(--ink);background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #00212d12;container-type:inline-size;text-align:left}
 :host([hidden]){display:none}
-:host([theme="nuit"]){--card:#00212d;--ink:#fff;--muted:#b7c4c8;--line:#ffffff22;--day-bg:#ffffff12;--day-border:#ffffff1c;--day-hover:#ffffff24;--day-text:#e0b755;--sel-bg:#e0b755;--sel-text:#00212d;--sel-caption:#3a2e00;--accent:#e0b755;--accent-text:#00212d}
+:host([theme="sombre"]),:host([theme="nuit"]){--card:#00212d;--ink:#fff;--muted:#b7c4c8;--line:#ffffff22;--day-bg:#ffffff12;--day-border:#ffffff1c;--day-hover:#ffffff24;--day-text:#e0b755;--sel-bg:#e0b755;--sel-text:#00212d;--sel-caption:#3a2e00;--within-bg:#e0b75544;--accent:#e0b755;--accent-strong:#e0b755;--accent-text:#00212d}
 *{box-sizing:border-box}button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;margin:0}button:disabled{cursor:default}a{color:inherit}
 button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #347085;outline-offset:3px}
 .head{position:relative;isolation:isolate;min-height:168px;display:flex;flex-direction:column;justify-content:flex-end;padding:22px 24px 20px;color:#fff;background:var(--navy)}
@@ -127,12 +131,16 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 .day.available:hover{background:var(--day-hover);transform:translateY(-2px);border-color:var(--accent)}
 .day.full .cap,.day.closed .cap{color:#9d735e}.day.unknown .cap{color:var(--muted)}.day.past{opacity:.35}
 .day.loading .cap{background:var(--day-bg);border-radius:4px;color:transparent;width:24px;animation:pulse 1.3s ease-in-out infinite}
-.day.selected{background:var(--sel-bg)!important;border-color:var(--sel-bg);color:var(--sel-text);transform:none}
-.day.selected .cap{color:var(--sel-caption)}
+.day.can-end{cursor:pointer}.day.can-end:hover{box-shadow:inset 0 0 0 1px var(--accent);transform:none}
+.day.start,.day.end{background:var(--sel-bg)!important;border-color:var(--sel-bg)!important;color:var(--sel-text);transform:none!important;opacity:1}
+.day.start{border-radius:8px 3px 3px 8px}.day.end{border-radius:3px 8px 8px 3px}
+.day.start .cap,.day.end .cap{color:var(--sel-caption)!important;font-weight:600;letter-spacing:.3px}
+.day.within{background:var(--within-bg)!important;border-color:var(--within-bg)!important;border-radius:3px}
 .who{position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%}
 .key{display:flex;justify-content:space-between;gap:8px;font-size:8px;color:var(--muted);margin-top:14px}
 .key i{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;margin-right:5px}
-.notice{font-size:10px;line-height:1.6;color:#8d664b;margin-top:10px}:host([theme="nuit"]) .notice{color:#e8c48b}.notice:empty{display:none}
+.key b{display:inline-block;width:14px;height:6px;background:var(--sel-bg);border-radius:2px;margin-right:5px;vertical-align:middle}
+.notice{font-size:10px;line-height:1.6;color:#8d664b;margin-top:10px}:host([theme="sombre"]) .notice,:host([theme="nuit"]) .notice{color:#e8c48b}.notice:empty{display:none}
 .retry{margin-top:10px;font-size:10px;padding:9px 13px;border-radius:7px;background:var(--day-bg);color:var(--day-text)}
 .pick[hidden]{display:none}.pick{margin-top:16px;padding:16px 18px;border-radius:12px;background:var(--day-bg);border:1px solid var(--day-border);display:grid;gap:9px;animation:reveal .3s ease;outline:none}
 .pick .eyebrow{color:var(--muted);letter-spacing:.8px;font-size:8px;text-transform:none}
@@ -145,9 +153,46 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 .pick .text{justify-self:start;font-size:10px;text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
 .foot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:9px;color:var(--muted);line-height:1.5}
 .foot a{white-space:nowrap;color:var(--ink)}
+/* Design 2 · cercles : le numéro dans une pastille ronde, le prix dessous. */
+:host([design="cercles"]) .weekdays,:host([design="cercles"]) .grid{gap:2px 4px}
+:host([design="cercles"]) .day{height:60px;border:0;background:none!important;gap:3px;padding:2px 0;border-radius:0}
+:host([design="cercles"]) .num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid transparent;line-height:1;transition:background .15s,border-color .15s}
+:host([design="cercles"]) .day.available .num{background:var(--day-bg);border-color:var(--day-border)}
+:host([design="cercles"]) .day.available:hover{transform:none}
+:host([design="cercles"]) .day.available:hover .num{background:var(--day-hover);border-color:var(--accent)}
+:host([design="cercles"]) .day.can-end:hover{box-shadow:none}:host([design="cercles"]) .day.can-end:hover .num{border-color:var(--accent)}
+:host([design="cercles"]) .day.start,:host([design="cercles"]) .day.end{color:var(--ink)}
+:host([design="cercles"]) .day.start .num,:host([design="cercles"]) .day.end .num{background:var(--sel-bg);color:var(--sel-text);border-color:var(--sel-bg)}
+:host([design="cercles"]) .day.start .cap,:host([design="cercles"]) .day.end .cap{color:var(--accent-strong)!important}
+:host([design="cercles"]) .day.within .num{box-shadow:inset 0 0 0 2px var(--accent)}
+:host([design="cercles"]) .who{bottom:auto;top:30px;right:calc(50% - 20px)}
+:host([design="cercles"]) .nav button{border:0;background:var(--day-bg)}
+:host([design="cercles"]) .pick{border-radius:22px}
+:host([design="cercles"]) .pick .book{border-radius:30px;padding-left:18px;padding-right:18px}
+/* Design 3 · lignes : carnet de séjour, grands chiffres condensés, filets fins. */
+:host([design="lignes"]){border-radius:6px;box-shadow:0 10px 30px #00212d0e}
+:host([design="lignes"]) .head{min-height:150px}:host([design="lignes"]) .head h2{font-weight:600;letter-spacing:0}
+:host([design="lignes"]) .weekdays{font-size:8px;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:0}
+:host([design="lignes"]) .grid{gap:0}
+:host([design="lignes"]) .day{height:58px;border-radius:0!important;border:0;border-bottom:1px solid var(--line);align-items:flex-start;padding:7px 8px 6px;gap:4px;background:none!important}
+:host([design="lignes"]) .num{font-family:var(--display);font-size:20px;line-height:1;font-weight:500}
+:host([design="lignes"]) .cap{font-size:8px}
+:host([design="lignes"]) .day.available:hover{transform:none;box-shadow:inset 0 -2px 0 var(--accent)}
+:host([design="lignes"]) .day.can-end:hover{box-shadow:inset 0 -2px 0 var(--accent)}
+:host([design="lignes"]) .day.start,:host([design="lignes"]) .day.end{box-shadow:inset 0 -3px 0 var(--accent);color:var(--ink)}
+:host([design="lignes"]) .day.start .num,:host([design="lignes"]) .day.end .num{color:var(--accent-strong)}
+:host([design="lignes"]) .day.start .cap,:host([design="lignes"]) .day.end .cap{color:var(--accent-strong)!important}
+:host([design="lignes"]) .day.within{box-shadow:inset 0 -3px 0 var(--within-bg)}
+:host([design="lignes"]) .day.past{opacity:.3}
+:host([design="lignes"]) .who{bottom:auto;top:9px;right:8px}
+:host([design="lignes"]) .nav button{border-radius:0;border:0;border-bottom:1px solid var(--line)}
+:host([design="lignes"]) .nav h3{font-family:var(--display);font-size:22px;text-transform:uppercase;letter-spacing:.5px}
+:host([design="lignes"]) .pick{border-radius:0;border:0;border-top:2px solid var(--accent);background:none;padding:16px 0 0}
+:host([design="lignes"]) .pick .book{border-radius:0}
+:host([design="lignes"]) .retry{border-radius:0}
 @keyframes pulse{50%{opacity:.4}}@keyframes reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @container (max-width:640px){.months{grid-template-columns:1fr}}
-@container (max-width:420px){.body{padding:15px 13px 16px}.day{height:48px;border-radius:6px}.weekdays,.grid{gap:3px}.num{font-size:12px}.cap{font-size:7px}.head{min-height:140px;padding:18px 18px 16px}.head h2{font-size:34px}.foot{display:block}.foot a{display:block;margin-top:6px}.pick{padding:14px}.pick .price{font-size:28px}}
+@container (max-width:420px){.body{padding:15px 13px 16px}.day{height:48px;border-radius:6px}.weekdays,.grid{gap:3px}.num{font-size:12px}.cap{font-size:7px}.head{min-height:140px;padding:18px 18px 16px}.head h2{font-size:34px}.foot{display:block}.foot a{display:block;margin-top:6px}.pick{padding:14px}.pick .price{font-size:28px}:host([design="cercles"]) .num{width:30px;height:30px}:host([design="lignes"]) .num{font-size:17px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}`;
 
   const SHELL = `<header class="head" id="head"><img id="photo" alt="" hidden><span class="eyebrow" id="eyebrow"></span><h2 id="title"></h2><p id="tagline"></p></header>
@@ -155,14 +200,14 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 <div class="top"><div class="occupancy" id="occupancy"></div><span class="live" id="live" role="status"></span></div>
 <div class="nav"><button type="button" id="prev" aria-label="Mois précédent">‹</button><h3 id="month" aria-live="polite"></h3><button type="button" id="next" aria-label="Mois suivant">›</button></div>
 <div class="months" id="months"></div>
-<div class="key"><span><i></i> Tarif « dès », par nuit, pour la composition choisie</span><span>— Indisponible</span></div>
+<div class="key"><span><i></i> Tarif « dès », par nuit, pour la composition choisie</span><span><b></b>Nuit : arrivée → départ</span></div>
 <div class="notice" id="notice" role="status"></div>
 <button type="button" class="retry" id="retry" hidden>Actualiser les disponibilités ↻</button>
 <div class="pick" id="pick" hidden tabindex="-1" aria-live="polite"></div>
 <div class="foot"><span id="footText"></span><a id="siteLink" target="_blank" rel="noopener">Voir sur le site du parc ↗</a></div>
 </div>`;
 
-  const api = {LODGES, byId, addDays, monthStart, monthEnd, shiftMonth, parisToday, clampOccupancy, apiUrl, normalize, bookingUrl, fetchRange};
+  const api = {LODGES, byId, addDays, nightsBetween, monthStart, monthEnd, shiftMonth, parisToday, clampOccupancy, apiUrl, normalize, bookingUrl, fetchRange};
 
   if (typeof HTMLElement !== 'undefined' && typeof customElements !== 'undefined') {
     class ParcCalendrier extends HTMLElement {
@@ -171,7 +216,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         super();
         this.attachShadow({mode: 'open'});
         this._cache = new Map(); this._req = 0; this._verify = 0; this._results = new Map();
-        this._loading = false; this._failed = false; this._selected = null; this._mounted = false;
+        this._loading = false; this._failed = false; this._selected = null; this._nights = null; this._mounted = false;
         this._month = monthStart(parisToday()); this._months = 1; this._lodge = LODGES.tous; this._occ = clampOccupancy(LODGES.tous, {adults: 2});
         this._onOffline = () => {this._req++; if (this._controller) this._controller.abort(); this._cache.clear(); this._results = new Map(); this._loading = false; this._failed = true; this._clear(); this._paint();};
         this._onOnline = () => this._load(true);
@@ -193,7 +238,9 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
       }
       get selection() {
         const v = this._selected && this._results.get(this._selected);
-        return v && v.status === 'available' ? {date: v.date, nights: v.nights, price: v.price, room: v.room.name, roomId: v.room.id, adults: this._occ.adults, children: this._occ.children, url: bookingUrl(v, this._occ)} : null;
+        if (!v || v.status !== 'available') return null;
+        const nights = this._nights || v.nights;
+        return {date: v.date, departure: addDays(v.date, nights), nights, minNights: v.nights, price: v.price, room: v.room.name, roomId: v.room.id, adults: this._occ.adults, children: this._occ.children, url: bookingUrl(v, this._occ, true, nights)};
       }
       refresh() {this._cache.clear(); this._load(true);}
       _configure() {
@@ -213,7 +260,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         this.$('prev').addEventListener('click', () => this._move(-1));
         this.$('next').addEventListener('click', () => this._move(1));
         this.$('retry').addEventListener('click', () => this._load(true));
-        this.$('months').addEventListener('click', e => {const b = e.target.closest('button[data-date]'); if (b && !b.disabled) this._select(b.dataset.date);});
+        this.$('months').addEventListener('click', e => {const b = e.target.closest('button[data-date]'); if (b && !b.disabled) this._pick(b.dataset.date);});
         this.$('pick').addEventListener('click', e => {if (e.target.closest('#clear')) this._clear(true);});
         this.$('occupancy').addEventListener('change', () => this._readOccupancy());
       }
@@ -267,17 +314,27 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
           this.$('month').textContent = `${cap(fmt(this._month, sameYear ? {month: 'long'} : {month: 'long', year: 'numeric'}))} – ${fmt(next, {month: 'long', year: 'numeric'})}`;
         } else this.$('month').textContent = cap(fmt(this._month, {month: 'long', year: 'numeric'}));
       }
+      _stay() {
+        const arrival = this._selected;
+        if (!arrival) return null;
+        const value = this._results.get(arrival), nights = this._nights || (value ? value.nights : 1);
+        return {arrival, nights, departure: addDays(arrival, nights), latest: addDays(arrival, value ? value.maxNights : 31)};
+      }
       _cells(month) {
-        const today = parisToday(), start = new Date(month + 'T12:00:00Z'), days = Number(monthEnd(month).slice(8));
+        const today = parisToday(), start = new Date(month + 'T12:00:00Z'), days = Number(monthEnd(month).slice(8)), stay = this._stay();
         let html = '<span aria-hidden="true"></span>'.repeat((start.getUTCDay() + 6) % 7);
         for (let day = 1; day <= days; day++) {
           const date = month.slice(0, 8) + String(day).padStart(2, '0');
           const past = date < today, v = this._results.get(date);
           const status = past ? 'past' : this._loading ? 'loading' : v ? v.status : 'unknown';
-          const active = status === 'available';
-          const caption = past ? '' : status === 'loading' ? '…' : active ? money(v.price) : status === 'unknown' ? '?' : '—';
-          const detail = past ? 'date passée' : status === 'loading' ? 'chargement' : active ? `dès ${money(v.price)} par nuit${v.nights > 1 ? `, ${v.nights} nuits minimum` : ''}${this._lodge.id ? '' : ', ' + v.room.name}` : status === 'full' ? 'indisponible' : status === 'closed' ? 'arrivée impossible ce jour' : 'disponibilité inconnue';
-          html += `<button type="button" class="day ${status}${this._selected === date ? ' selected' : ''}" data-date="${date}"${active ? '' : ' disabled'} aria-label="${esc(cap(fmt(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})) + ', ' + detail)}" aria-pressed="${this._selected === date}"><span class="num">${day}</span><span class="cap">${caption}</span>${active && !this._lodge.id ? `<i class="who" style="background:${v.room.color}" aria-hidden="true"></i>` : ''}</button>`;
+          const isStart = !!stay && date === stay.arrival, isEnd = !!stay && date === stay.departure, within = !!stay && date > stay.arrival && date < stay.departure;
+          const canEnd = !!stay && !this._loading && date > stay.arrival && date <= stay.latest && !(v && v.noDeparture);
+          const available = status === 'available', active = available || canEnd;
+          const classes = ['day', status, isStart ? 'start' : '', isEnd ? 'end' : '', within ? 'within' : '', canEnd && !isEnd ? 'can-end' : ''].filter(Boolean).join(' ');
+          const caption = past ? '' : status === 'loading' ? '…' : isStart ? 'arrivée' : isEnd ? 'départ' : within ? '' : available ? money(v.price) : status === 'unknown' ? '?' : '—';
+          const detail = past ? 'date passée' : status === 'loading' ? 'chargement' : isStart ? 'jour d’arrivée choisi' : isEnd ? 'jour de départ' : available ? `dès ${money(v.price)} par nuit${v.nights > 1 ? `, ${v.nights} nuits minimum` : ''}${this._lodge.id ? '' : ', ' + v.room.name}` : status === 'full' ? 'indisponible' : status === 'closed' ? 'arrivée impossible ce jour' : 'disponibilité inconnue';
+          const extra = canEnd && !isEnd ? ', choisir comme jour de départ' : '';
+          html += `<button type="button" class="${classes}" data-date="${date}"${active ? '' : ' disabled'} aria-label="${esc(cap(fmt(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})) + ', ' + detail + extra)}" aria-pressed="${isStart || isEnd}"><span class="num">${day}</span><span class="cap">${caption}</span>${available && !this._lodge.id && !isStart && !isEnd ? `<i class="who" style="background:${v.room.color}" aria-hidden="true"></i>` : ''}</button>`;
         }
         return html;
       }
@@ -296,19 +353,30 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
       _paintError(message) {this.$('head').style.display = 'none'; this.$('notice').textContent = message; this.$('live').textContent = 'Configuration'; this.$('months').innerHTML = ''; this.$('occupancy').innerHTML = ''; this.$('month').textContent = ''; this.$('pick').hidden = true;}
       _clear(focus) {
         const date = this._selected; this._verify++; if (this._verifier) this._verifier.abort();
-        this._selected = null; this._paintPick(null);
+        this._selected = null; this._nights = null; this._paintPick(null);
         if (date) {this._paintGrid(); if (focus) {const b = this.shadowRoot.querySelector(`[data-date="${date}"]`); if (b) b.focus({preventScroll: true});}}
+      }
+      // Premier clic : l’arrivée, la nuit s’affiche jusqu’au départ minimum. Clic sur un jour suivant : le départ se déplace.
+      _pick(date) {
+        const stay = this._stay(), v = this._results.get(date);
+        if (stay && date > stay.arrival && date <= stay.latest && !(v && v.noDeparture)) {
+          const arrival = this._results.get(stay.arrival), nights = nightsBetween(stay.arrival, date);
+          if (!arrival || nights < arrival.nights) {this._paintPick(arrival, `Séjour minimum de ${plural(arrival ? arrival.nights : 1, 'nuit')} pour cette date d’arrivée.`); return;}
+          this._nights = nights; this._paintGrid(); this._paintPick(arrival, 'Départ modifié. Le tarif total est confirmé sur le moteur officiel.'); this._emit();
+          return;
+        }
+        if (v && v.status === 'available') this._select(date);
       }
       _select(date) {
         const value = this._results.get(date);
         if (!value || value.status !== 'available') return;
-        this._selected = date; this._paintGrid(); this._paintPick(value, 'Vérification de la date auprès de D-EDGE…');
+        this._selected = date; this._nights = value.nights; this._paintGrid(); this._paintPick(value, 'Vérification de la date auprès de D-EDGE…');
         this.$('pick').focus({preventScroll: true});
         const req = ++this._verify; if (this._verifier) this._verifier.abort(); this._verifier = new AbortController();
         fetchRange(this._lodge, date, date, this._occ, this._verifier.signal).then(map => {
           if (req !== this._verify) return;
           const fresh = map.get(date);
-          if (fresh) this._results.set(date, fresh);
+          if (fresh) {this._results.set(date, fresh); if (this._nights < fresh.nights) this._nights = fresh.nights;}
           const current = this._results.get(date);
           this._paintGrid();
           this._paintPick(current, fresh && fresh.status === 'available' ? 'Disponibilité confirmée à l’instant. Prix final et conditions confirmés sur le moteur officiel.' : 'Cette date n’est plus confirmée pour cette composition. Choisissez une autre date ou vérifiez sur le moteur officiel.');
@@ -319,17 +387,17 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
       _paintPick(value, hint) {
         const el = this.$('pick');
         if (!value) {el.hidden = true; el.innerHTML = ''; this.$('footText').textContent = 'Choisissez une date d’arrivée.'; return;}
-        const o = this._occ, available = value.status === 'available';
-        const who = `${o.adults} adulte${o.adults > 1 ? 's' : ''}${o.children ? `, ${o.children} enfant${o.children > 1 ? 's' : ''}` : ''}`;
-        const stay = value.nights > 1 ? `${value.nights} nuits minimum` : '1 nuit';
+        const o = this._occ, available = value.status === 'available', nights = this._nights || value.nights;
+        const who = `${plural(o.adults, 'adulte')}${o.children ? `, ${plural(o.children, 'enfant')}` : ''}`;
+        const stay = `${plural(nights, 'nuit')}${value.nights > 1 ? ` · minimum ${value.nights}` : ''}`;
         const short = d => cap(fmt(d, {weekday: 'short', day: 'numeric', month: 'long'}));
         el.hidden = false;
-        el.innerHTML = `<span class="eyebrow">${short(value.date)} → ${short(addDays(value.date, value.nights))} · ${stay} · ${who}</span>` +
+        el.innerHTML = `<span class="eyebrow">${short(value.date)} → ${short(addDays(value.date, nights))} · ${stay} · ${who}</span>` +
           (this._lodge.id ? '' : `<span class="lodge">${esc(value.room.name)}</span>`) +
-          (available ? `<span class="price">${money(value.price)}<small>par nuit · dès</small></span><a class="book" href="${bookingUrl(value, o)}" target="_blank" rel="noopener">Réserver sur le moteur officiel <span>↗</span></a>` : `<span class="price">Indisponible</span><a class="book" href="${bookingUrl(value, o, false)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
-          (this._lodge.id || !available ? '' : `<a class="more" href="${bookingUrl(value, o, false)}" target="_blank" rel="noopener">Tous les hébergements à cette date ↗</a>`) +
-          `<span class="hint">${esc(hint || '')}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
-        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour.`;
+          (available ? `<span class="price">${money(value.price)}<small>par nuit · dès</small></span><a class="book" href="${bookingUrl(value, o, true, nights)}" target="_blank" rel="noopener">Réserver ${plural(nights, 'nuit')} sur le moteur officiel <span>↗</span></a>` : `<span class="price">Indisponible</span><a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
+          (this._lodge.id || !available ? '' : `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`) +
+          `<span class="hint">${esc(hint || '')}${available ? ' Un clic sur un jour suivant déplace la date de départ.' : ''}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
+        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
       }
     }
     api.ParcCalendrier = ParcCalendrier;

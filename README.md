@@ -7,6 +7,8 @@ Prototype de présentation en quatre parties :
 3. Calendrier commun des quatre logements, pour **une nuit et deux adultes**.
 4. **Les sept calendriers du site, refaits à notre charte**, chacun sous forme de balise HTML `<parc-calendrier>`.
 
+Une page à part, `calendriers.html`, regroupe ces sept calendriers avec la balise à copier à côté de chacun, en trois designs (cases pleines, cercles, lignes fines) et deux modes (clair, sombre).
+
 Dans la troisième partie, le choix des logements, leurs prix et les boutons de réservation remplacent le mois **dans la même carte calendrier**. Le bouton « Changer de date » réaffiche le mois ; aucun panneau de choix n’est ajouté sous le calendrier. Les sources des anciens calendriers sont conservées dans `src/legacy/`.
 
 Le calendrier interroge le service public du widget D-EDGE séparément pour La Tanière (140910), Le Refuge (140908), La Cabane du Trappeur (140907) et Asian Lodge (163456). Une seule disponibilité suffit à rendre une date sélectionnable. Le calendrier affiche le prix minimum ; les cartes affichent les prix individuels. Une date sélectionnée est revérifiée avant de proposer les liens de réservation.
@@ -53,14 +55,16 @@ La quatrième partie du prototype affiche ces sept calendriers dans la charte du
 | `adultes`, `enfants`, `ages` | nombres, âges séparés par des virgules | Composition de départ ; le visiteur la modifie dans les limites du logement. |
 | `mois` | `1` ou `2` | Nombre de mois affichés côte à côte. |
 | `photo`, `titre`, `sous-titre` | texte / URL | En-tête de la carte. |
-| `theme` | `nuit` | Fond bleu nuit, sélection dorée. |
+| `design` | `cases`, `cercles`, `lignes` | Trois designs ; `cases` par défaut. |
+| `theme` | `clair`, `sombre` | Mode clair par défaut ; `sombre` : fond bleu nuit, sélection dorée (`nuit` reste accepté). |
 | `compact` | présent ou non | Sans en-tête. |
 
-La balise émet l’événement `parc-calendrier:selection` (détail : date, nuits, prix, logement, lien) et expose `element.selection` et `element.refresh()`.
+La balise émet l’événement `parc-calendrier:selection` (détail : date, départ, nuits, prix, logement, lien) et expose `element.selection` et `element.refresh()`.
 
 ### Comportement
 
 - Tarif « dès » par nuit pour la composition choisie, revérifié au clic sur une date.
+- La nuit s’affiche sur deux jours, de l’arrivée au départ ; un clic sur un jour suivant déplace le départ, dans la limite du séjour maximum. Le total du séjour est confirmé sur le moteur officiel.
 - Les gîtes imposent un séjour minimum : la date de départ et le lien de réservation en tiennent compte.
 - Le lien « Réserver » ouvre le moteur officiel avec logement, dates et voyageurs préremplis ; le prix final et les conditions y sont confirmés.
 - Un service qui ne répond pas n’est jamais affiché comme complet ; un bouton permet de réessayer.
@@ -75,10 +79,10 @@ node build.mjs
 node --test tests/calendar.test.cjs tests/embed.test.cjs
 ```
 
-La construction produit un seul HTML autonome et le fichier `parc-calendrier.js`. Le jeton dans `src/widget-config.json` est celui du widget public embarqué sur les pages officielles, déjà exposé aux navigateurs ; il ne donne pas accès à l’administration. Cette intégration dépend de la disponibilité du service D-EDGE, de ce jeton et de ses règles CORS. Pour une mise en production commerciale, faire valider l’intégration et la pérennité de cet accès par D-EDGE. Le moteur officiel confirme toujours le prix et les conditions.
+La construction produit deux HTML autonomes, `index.html` et `calendriers.html`, et le fichier `parc-calendrier.js`. Le jeton dans `src/widget-config.json` est celui du widget public embarqué sur les pages officielles, déjà exposé aux navigateurs ; il ne donne pas accès à l’administration. Cette intégration dépend de la disponibilité du service D-EDGE, de ce jeton et de ses règles CORS. Pour une mise en production commerciale, faire valider l’intégration et la pérennité de cet accès par D-EDGE. Le moteur officiel confirme toujours le prix et les conditions.
 
 ## Publication
 
-GitHub Pages publie la racine de la branche `main`. Une modification de `index.html` ou de `parc-calendrier.js` poussée sur cette branche déclenche la mise à jour du site.
+GitHub Pages publie la racine de la branche `main`. Une modification de `index.html`, `calendriers.html` ou `parc-calendrier.js` poussée sur cette branche déclenche la mise à jour du site.
 
 Le fichier peut aussi être ouvert directement dans un navigateur en local.
