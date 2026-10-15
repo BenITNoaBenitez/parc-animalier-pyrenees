@@ -322,7 +322,7 @@
   <div class="embed-grid" id="embed-grid"></div>
   <div class="embed-docs">
    <details><summary>Attributs de la balise</summary><p><code>logement</code> : <code>tous</code>, <code>taniere</code>, <code>refuge</code>, <code>trappeur</code>, <code>asian</code>, <code>grange</code> ou <code>moulin</code> ; ou <code>chambre="140910"</code> avec l’identifiant D-EDGE. <code>adultes</code>, <code>enfants</code>, <code>ages</code> : composition de départ, que le visiteur modifie dans les limites fixées pour chaque logement sur le site. <code>mois="2"</code> : deux mois côte à côte. <code>photo</code>, <code>titre</code>, <code>sous-titre</code> : en-tête. <code>design</code> : <code>cases</code>, <code>cercles</code> ou <code>lignes</code>. <code>theme="sombre"</code> : fond bleu nuit, sélection dorée. <code>compact</code> : sans en-tête.</p></details>
-   <details><summary>Ce que fait la balise</summary><p>Elle interroge le même service public D-EDGE que les widgets du site, avec le jeton public déjà exposé sur les pages officielles. Elle affiche le tarif « dès » par nuit pour la composition choisie, montre la nuit sur deux jours de l’arrivée au départ, laisse régler la durée avec − et +, revérifie la date, puis envoie vers le moteur officiel avec le logement, les dates, le séjour minimum et les voyageurs préremplis. Aucun paiement ni donnée personnelle ne transite par la balise. Un service qui ne répond pas n’est jamais affiché comme complet. Un événement <code>parc-calendrier:selection</code> est émis à chaque date choisie, pour la mesure d’audience si elle est autorisée.</p></details>
+   <details><summary>Ce que fait la balise</summary><p>Elle interroge le même service public D-EDGE que les widgets du site, avec le jeton public déjà exposé sur les pages officielles. Elle affiche le tarif « dès » par nuit pour la composition choisie, dessine chaque nuit disponible du jour au lendemain, laisse déplacer le départ sur les nuits suivantes disponibles, revérifie la date, puis envoie vers le moteur officiel avec le logement, les dates, le séjour minimum et les voyageurs préremplis. Aucun paiement ni donnée personnelle ne transite par la balise. Un service qui ne répond pas n’est jamais affiché comme complet. Un événement <code>parc-calendrier:selection</code> est émis à chaque date choisie, pour la mesure d’audience si elle est autorisée.</p></details>
    <details><summary>Limites &amp; mise en production</summary><p>Le prototype dépend de la disponibilité du service D-EDGE, de son jeton public et de ses règles CORS : D-EDGE doit valider cette intégration avant un usage commercial. L’âge des enfants influence le tarif, la balise le demande comme le widget officiel. Les gîtes imposent un séjour minimum, affiché avec la date de départ correspondante. Le prix final et les conditions sont toujours confirmés sur le moteur officiel.</p></details>
   </div>
  </section>
@@ -553,7 +553,8 @@
  * Réservation : moteur officiel D-EDGE. Cette balise ne traite ni paiement ni donnée personnelle.
  * Usage : <script src="parc-calendrier.js" defer><\/script> puis <parc-calendrier logement="taniere"></parc-calendrier>
  * Attributs : logement | chambre, adultes, enfants, ages, mois (1|2), design (cases|cercles|lignes), theme (clair|sombre), photo, titre, sous-titre, compact.
- * Un clic choisit la nuit du jour cliqué (ce jour → le lendemain, séjour minimum compris) ; la durée se règle avec − et + dans le panneau.
+ * Une nuit disponible s’affiche du jour au lendemain. Un clic choisit cette nuit (ses deux jours) ; un clic plus loin déplace le départ
+ * tant que les nuits intermédiaires sont disponibles. Les boutons − et + du panneau font de même.
  */
 (function (root) {
   'use strict';
@@ -647,9 +648,9 @@
   }
 
   const STYLE = `
-:host{--green:#91ab2a;--navy:#00212d;--pale:#edf1dc;--gold:#e0b755;--ink:#07242d;--muted:#738083;--line:#e6eaea;--card:#fff;--day-bg:#f0f4e1;--day-border:#e6edcf;--day-hover:#e3edc1;--day-text:#607719;--sel-bg:#00212d;--sel-text:#fff;--sel-caption:#e2edb9;--within-bg:#dfe8c0;--accent:#91ab2a;--accent-strong:#5c7414;--accent-text:#172900;--body:'DM Sans',system-ui,sans-serif;--display:'Barlow Condensed','Arial Narrow',sans-serif;--months:1;display:block;font-family:var(--body);font-size:13px;line-height:1.4;color:var(--ink);background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #00212d12;container-type:inline-size;text-align:left}
+:host{--green:#91ab2a;--navy:#00212d;--pale:#edf1dc;--gold:#e0b755;--ink:#07242d;--muted:#738083;--line:#e6eaea;--card:#fff;--day-bg:#f0f4e1;--day-border:#e6edcf;--day-hover:#e3edc1;--day-text:#607719;--sel-bg:#00212d;--sel-text:#fff;--sel-caption:#e2edb9;--within-bg:#dfe8c0;--night-line:#cddab9;--accent:#91ab2a;--accent-strong:#5c7414;--accent-text:#172900;--body:'DM Sans',system-ui,sans-serif;--display:'Barlow Condensed','Arial Narrow',sans-serif;--months:1;display:block;font-family:var(--body);font-size:13px;line-height:1.4;color:var(--ink);background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #00212d12;container-type:inline-size;text-align:left}
 :host([hidden]){display:none}
-:host([theme="sombre"]),:host([theme="nuit"]){--card:#00212d;--ink:#fff;--muted:#b7c4c8;--line:#ffffff22;--day-bg:#ffffff12;--day-border:#ffffff1c;--day-hover:#ffffff24;--day-text:#e0b755;--sel-bg:#e0b755;--sel-text:#00212d;--sel-caption:#3a2e00;--within-bg:#e0b75544;--accent:#e0b755;--accent-strong:#e0b755;--accent-text:#00212d}
+:host([theme="sombre"]),:host([theme="nuit"]){--card:#00212d;--ink:#fff;--muted:#b7c4c8;--line:#ffffff22;--day-bg:#ffffff12;--day-border:#ffffff1c;--day-hover:#ffffff24;--day-text:#e0b755;--sel-bg:#e0b755;--sel-text:#00212d;--sel-caption:#3a2e00;--within-bg:#e0b75544;--night-line:#e0b75566;--accent:#e0b755;--accent-strong:#e0b755;--accent-text:#00212d}
 *{box-sizing:border-box}button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;margin:0}button:disabled{cursor:default}a{color:inherit}
 button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #347085;outline-offset:3px}
 .head{position:relative;isolation:isolate;min-height:168px;display:flex;flex-direction:column;justify-content:flex-end;padding:22px 24px 20px;color:#fff;background:var(--navy)}
@@ -676,18 +677,23 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 .weekdays{font-size:9px;color:var(--muted);text-align:center;margin-bottom:8px}
 .day{height:52px;border:1px solid transparent;border-radius:8px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;position:relative;padding:3px 0;font-variant-numeric:tabular-nums}
 .num{font-size:13px;line-height:16px}.cap{font-size:8px;line-height:10px;white-space:nowrap}
-.day.available{background:var(--day-bg);border-color:var(--day-border);transition:background .15s,transform .15s}
+.day.available{background:var(--day-bg);border-color:var(--day-border);transition:background .15s,border-color .15s}
 .day.available .cap{color:var(--day-text);font-weight:600}
-.day.available:hover{background:var(--day-hover);transform:translateY(-2px);border-color:var(--accent)}
+.day.available:hover{background:var(--day-hover);border-color:var(--accent)}
+.day.available::after,.day.start::after,.day.within::after{content:'';position:absolute;top:-1px;bottom:-1px;left:100%;width:6px;background:var(--day-bg);pointer-events:none}
+.day.start::after{background:var(--sel-bg)}.day.within::after{background:var(--within-bg)}
+.grid>.day:nth-child(7n)::after,.day.last::after{display:none}
+.day.night-end{background:linear-gradient(90deg,var(--day-bg) 50%,transparent 50%)}
+.day.can-end{cursor:pointer}.day.can-end:hover{box-shadow:inset 0 0 0 1px var(--accent)}
 .day.full .cap,.day.closed .cap{color:#9d735e}.day.unknown .cap{color:var(--muted)}.day.past{opacity:.35}
 .day.loading .cap{background:var(--day-bg);border-radius:4px;color:transparent;width:24px;animation:pulse 1.3s ease-in-out infinite}
-.day.start,.day.end{background:var(--sel-bg)!important;border-color:var(--sel-bg)!important;color:var(--sel-text);transform:none!important;opacity:1}
+.day.start,.day.end{background:var(--sel-bg)!important;border-color:var(--sel-bg)!important;color:var(--sel-text);opacity:1}
 .day.start{border-radius:8px 3px 3px 8px}.day.end{border-radius:3px 8px 8px 3px}
 .day.start .cap,.day.end .cap{color:var(--sel-caption)!important;font-weight:600;letter-spacing:.3px}
 .day.within{background:var(--within-bg)!important;border-color:var(--within-bg)!important;border-radius:3px}
 .who{position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%}
 .key{display:flex;justify-content:space-between;gap:8px;font-size:8px;color:var(--muted);margin-top:14px}
-.key i{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;margin-right:5px}
+.key i{display:inline-block;width:16px;height:7px;background:linear-gradient(90deg,var(--day-bg) 70%,transparent 70%);border:1px solid var(--day-border);border-radius:2px;margin-right:5px;vertical-align:middle}
 .key b{display:inline-block;width:14px;height:6px;background:var(--sel-bg);border-radius:2px;margin-right:5px;vertical-align:middle}
 .notice{font-size:10px;line-height:1.6;color:#8d664b;margin-top:10px}:host([theme="sombre"]) .notice,:host([theme="nuit"]) .notice{color:#e8c48b}.notice:empty{display:none}
 .retry{margin-top:10px;font-size:10px;padding:9px 13px;border-radius:7px;background:var(--day-bg);color:var(--day-text)}
@@ -711,8 +717,11 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 :host([design="cercles"]) .day{height:60px;border:0;background:none!important;gap:3px;padding:2px 0;border-radius:0}
 :host([design="cercles"]) .num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid transparent;line-height:1;transition:background .15s,border-color .15s}
 :host([design="cercles"]) .day.available .num{background:var(--day-bg);border-color:var(--day-border)}
-:host([design="cercles"]) .day.available:hover{transform:none}
 :host([design="cercles"]) .day.available:hover .num{background:var(--day-hover);border-color:var(--accent)}
+:host([design="cercles"]) .day.available::after,:host([design="cercles"]) .day.start::after,:host([design="cercles"]) .day.within::after{top:22px;bottom:auto;height:3px;left:calc(50% + 17px);right:calc(17px - 50% - 4px);width:auto;background:var(--day-border)}
+:host([design="cercles"]) .day.start::after{background:var(--sel-bg)}:host([design="cercles"]) .day.within::after{background:var(--within-bg)}
+:host([design="cercles"]) .day.night-end .num{background:linear-gradient(90deg,var(--day-bg) 50%,transparent 50%)}
+:host([design="cercles"]) .day.can-end:hover{box-shadow:none}:host([design="cercles"]) .day.can-end:hover .num{border-color:var(--accent)}
 :host([design="cercles"]) .day.start,:host([design="cercles"]) .day.end{color:var(--ink)}
 :host([design="cercles"]) .day.start .num,:host([design="cercles"]) .day.end .num{background:var(--sel-bg);color:var(--sel-text);border-color:var(--sel-bg)}
 :host([design="cercles"]) .day.start .cap,:host([design="cercles"]) .day.end .cap{color:var(--accent-strong)!important}
@@ -729,11 +738,15 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 :host([design="lignes"]) .day{height:58px;border-radius:0!important;border:0;border-bottom:1px solid var(--line);align-items:flex-start;padding:7px 8px 6px;gap:4px;background:none!important}
 :host([design="lignes"]) .num{font-family:var(--display);font-size:20px;line-height:1;font-weight:500}
 :host([design="lignes"]) .cap{font-size:8px}
-:host([design="lignes"]) .day.available:hover{transform:none;box-shadow:inset 0 -2px 0 var(--accent)}
-:host([design="lignes"]) .day.start,:host([design="lignes"]) .day.end{box-shadow:inset 0 -3px 0 var(--accent);color:var(--ink)}
+:host([design="lignes"]) .day.available{box-shadow:inset 0 -3px 0 var(--night-line)}
+:host([design="lignes"]) .day.available:hover{box-shadow:inset 0 -3px 0 var(--accent)}
+:host([design="lignes"]) .day.available::after,:host([design="lignes"]) .day.start::after,:host([design="lignes"]) .day.within::after{display:none}
+:host([design="lignes"]) .day.night-end{background:linear-gradient(90deg,var(--night-line) 50%,transparent 50%) left bottom/100% 3px no-repeat!important}
+:host([design="lignes"]) .day.can-end:hover{box-shadow:inset 0 -3px 0 var(--accent)}
+:host([design="lignes"]) .day.start,:host([design="lignes"]) .day.end{box-shadow:inset 0 -3px 0 var(--accent)!important;color:var(--ink);background:none!important}
 :host([design="lignes"]) .day.start .num,:host([design="lignes"]) .day.end .num{color:var(--accent-strong)}
 :host([design="lignes"]) .day.start .cap,:host([design="lignes"]) .day.end .cap{color:var(--accent-strong)!important}
-:host([design="lignes"]) .day.within{box-shadow:inset 0 -3px 0 var(--within-bg)}
+:host([design="lignes"]) .day.within{box-shadow:inset 0 -3px 0 var(--within-bg)!important;background:none!important}
 :host([design="lignes"]) .day.past{opacity:.3}
 :host([design="lignes"]) .who{bottom:auto;top:9px;right:8px}
 :host([design="lignes"]) .nav button{border-radius:0;border:0;border-bottom:1px solid var(--line)}
@@ -751,7 +764,7 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
 <div class="top"><div class="occupancy" id="occupancy"></div><span class="live" id="live" role="status"></span></div>
 <div class="nav"><button type="button" id="prev" aria-label="Mois précédent">‹</button><h3 id="month" aria-live="polite"></h3><button type="button" id="next" aria-label="Mois suivant">›</button></div>
 <div class="months" id="months"></div>
-<div class="key"><span><i></i> Tarif « dès », par nuit, pour la composition choisie</span><span><b></b>Nuit : arrivée → départ</span></div>
+<div class="key"><span><i></i>Nuit disponible, du jour au lendemain · tarif « dès » par nuit</span><span><b></b>Nuit choisie : arrivée → départ</span></div>
 <div class="notice" id="notice" role="status"></div>
 <button type="button" class="retry" id="retry" hidden>Actualiser les disponibilités ↻</button>
 <div class="pick" id="pick" hidden tabindex="-1" aria-live="polite"></div>
@@ -865,11 +878,28 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
           this.$('month').textContent = `${cap(fmt(this._month, sameYear ? {month: 'long'} : {month: 'long', year: 'numeric'}))} – ${fmt(next, {month: 'long', year: 'numeric'})}`;
         } else this.$('month').textContent = cap(fmt(this._month, {month: 'long', year: 'numeric'}));
       }
+      // Nombre de nuits consécutives disponibles à partir de l’arrivée (même logement pour la vue d’ensemble), borné par le séjour maximum.
+      _run(arrival) {
+        const first = this._results.get(arrival);
+        if (!first) return 1;
+        let n = 0, date = arrival;
+        while (n < first.maxNights) {
+          const v = this._results.get(date);
+          if (!v || v.status !== 'available' || (!this._lodge.id && v.room.id !== first.room.id)) break;
+          n++; date = addDays(date, 1);
+        }
+        return Math.max(n, first.nights);
+      }
       _stay() {
         const arrival = this._selected;
         if (!arrival) return null;
-        const value = this._results.get(arrival), nights = this._nights || (value ? value.nights : 1);
-        return {arrival, nights, departure: addDays(arrival, nights)};
+        const value = this._results.get(arrival), min = value ? value.nights : 1, nights = this._nights || min;
+        return {arrival, nights, min, max: this._run(arrival), departure: addDays(arrival, nights)};
+      }
+      _canEnd(stay, date) {
+        if (!stay || date <= stay.arrival) return false;
+        const n = nightsBetween(stay.arrival, date), v = this._results.get(date);
+        return n >= stay.min && n <= stay.max && !(v && v.noDeparture);
       }
       _cells(month) {
         const today = parisToday(), start = new Date(month + 'T12:00:00Z'), days = Number(monthEnd(month).slice(8)), stay = this._stay();
@@ -879,11 +909,13 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
           const past = date < today, v = this._results.get(date);
           const status = past ? 'past' : this._loading ? 'loading' : v ? v.status : 'unknown';
           const isStart = !!stay && date === stay.arrival, isEnd = !!stay && date === stay.departure, within = !!stay && date > stay.arrival && date < stay.departure;
-          const available = status === 'available', active = available;
-          const classes = ['day', status, isStart ? 'start' : '', isEnd ? 'end' : '', within ? 'within' : ''].filter(Boolean).join(' ');
+          const available = status === 'available', canEnd = !!stay && !this._loading && this._canEnd(stay, date), active = available || canEnd;
+          const before = !past && !this._loading ? this._results.get(addDays(date, -1)) : null, nightEnd = !!before && before.status === 'available';
+          const classes = ['day', status, isStart ? 'start' : '', isEnd ? 'end' : '', within ? 'within' : '', canEnd && !isEnd ? 'can-end' : '', nightEnd ? 'night-end' : '', day === days ? 'last' : ''].filter(Boolean).join(' ');
           const caption = past ? '' : status === 'loading' ? '…' : isStart ? 'arrivée' : isEnd ? 'départ' : within ? '' : available ? money(v.price) : status === 'unknown' ? '?' : '—';
-          const detail = past ? 'date passée' : status === 'loading' ? 'chargement' : isStart ? 'jour d’arrivée choisi' : isEnd ? 'jour de départ' : available ? `dès ${money(v.price)} par nuit${v.nights > 1 ? `, ${v.nights} nuits minimum` : ''}${this._lodge.id ? '' : ', ' + v.room.name}` : status === 'full' ? 'indisponible' : status === 'closed' ? 'arrivée impossible ce jour' : 'disponibilité inconnue';
-          html += `<button type="button" class="${classes}" data-date="${date}"${active ? '' : ' disabled'} aria-label="${esc(cap(fmt(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})) + ', ' + detail)}" aria-pressed="${isStart || isEnd}"><span class="num">${day}</span><span class="cap">${caption}</span>${available && !this._lodge.id && !isStart && !isEnd ? `<i class="who" style="background:${v.room.color}" aria-hidden="true"></i>` : ''}</button>`;
+          const detail = past ? 'date passée' : status === 'loading' ? 'chargement' : isStart ? 'jour d’arrivée choisi' : isEnd ? 'jour de départ' : available ? `nuit disponible jusqu’au lendemain, dès ${money(v.price)}${v.nights > 1 ? `, ${v.nights} nuits minimum` : ''}${this._lodge.id ? '' : ', ' + v.room.name}` : status === 'full' ? 'indisponible' : status === 'closed' ? 'arrivée impossible ce jour' : 'disponibilité inconnue';
+          const extra = canEnd && !isEnd ? ', choisir comme jour de départ' : '';
+          html += `<button type="button" class="${classes}" data-date="${date}"${active ? '' : ' disabled'} aria-label="${esc(cap(fmt(date, {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})) + ', ' + detail + extra)}" aria-pressed="${isStart || isEnd}"><span class="num">${day}</span><span class="cap">${caption}</span>${available && !this._lodge.id && !isStart && !isEnd ? `<i class="who" style="background:${v.room.color}" aria-hidden="true"></i>` : ''}</button>`;
         }
         return html;
       }
@@ -905,14 +937,17 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         this._selected = null; this._nights = null; this._paintPick(null);
         if (date) {this._paintGrid(); if (focus) {const b = this.shadowRoot.querySelector(`[data-date="${date}"]`); if (b) b.focus({preventScroll: true});}}
       }
-      // Un clic choisit la nuit du jour cliqué : ce jour et le lendemain, séjour minimum compris. La durée se règle ensuite avec − et +.
-      _pick(date) {const v = this._results.get(date); if (v && v.status === 'available') this._select(date);}
-      _adjust(step) {
+      // Un clic choisit la nuit du jour cliqué (ses deux jours). Un clic plus loin déplace le départ si les nuits intermédiaires sont disponibles.
+      _pick(date) {
+        const stay = this._stay(), v = this._results.get(date);
+        if (stay && date !== stay.arrival && this._canEnd(stay, date)) {this._setNights(nightsBetween(stay.arrival, date)); return;}
+        if (v && v.status === 'available') this._select(date);
+      }
+      _adjust(step) {const stay = this._stay(); if (stay) this._setNights(Math.min(stay.max, Math.max(stay.min, stay.nights + step)));}
+      _setNights(nights) {
         const value = this._selected && this._results.get(this._selected);
-        if (!value || value.status !== 'available') return;
-        const nights = Math.min(value.maxNights, Math.max(value.nights, (this._nights || value.nights) + step));
-        if (nights === this._nights) return;
-        this._nights = nights; this._paintGrid(); this._paintPick(value, 'Durée modifiée. Le tarif total est confirmé sur le moteur officiel.'); this._emit();
+        if (!value || value.status !== 'available' || nights === this._nights) return;
+        this._nights = nights; this._paintGrid(); this._paintPick(value, 'Départ déplacé. Le tarif total est confirmé sur le moteur officiel.'); this._emit();
       }
       _select(date) {
         const value = this._results.get(date);
@@ -937,14 +972,15 @@ select{font:inherit;font-size:11px;color:var(--ink);background:var(--card);borde
         const o = this._occ, available = value.status === 'available', nights = this._nights || value.nights;
         const who = `${plural(o.adults, 'adulte')}${o.children ? `, ${plural(o.children, 'enfant')}` : ''}`;
         const stay = `${plural(nights, 'nuit')}${value.nights > 1 ? ` · minimum ${value.nights}` : ''}`;
-        const stepper = available ? `<div class="nights" role="group" aria-label="Durée du séjour"><span>Durée</span><button type="button" id="less" aria-label="Une nuit de moins"${nights <= value.nights ? ' disabled' : ''}>−</button><strong aria-live="polite">${plural(nights, 'nuit')}</strong><button type="button" id="more" aria-label="Une nuit de plus"${nights >= value.maxNights ? ' disabled' : ''}>+</button></div>` : '';
+        const run = this._stay(), max = run ? run.max : value.nights;
+        const stepper = available ? `<div class="nights" role="group" aria-label="Durée du séjour"><span>Durée</span><button type="button" id="less" aria-label="Une nuit de moins"${nights <= value.nights ? ' disabled' : ''}>−</button><strong aria-live="polite">${plural(nights, 'nuit')}</strong><button type="button" id="more" aria-label="Une nuit de plus"${nights >= max ? ' disabled' : ''}>+</button></div>` : '';
         const short = d => cap(fmt(d, {weekday: 'short', day: 'numeric', month: 'long'}));
         el.hidden = false;
         el.innerHTML = `<span class="eyebrow">${short(value.date)} → ${short(addDays(value.date, nights))} · ${stay} · ${who}</span>` +
           (this._lodge.id ? '' : `<span class="lodge">${esc(value.room.name)}</span>`) + stepper +
           (available ? `<span class="price">${money(value.price)}<small>par nuit · dès</small></span><a class="book" href="${bookingUrl(value, o, true, nights)}" target="_blank" rel="noopener">Réserver ${plural(nights, 'nuit')} sur le moteur officiel <span>↗</span></a>` : `<span class="price">Indisponible</span><a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
           (this._lodge.id || !available ? '' : `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`) +
-          `<span class="hint">${esc(hint || '')}${available && value.maxNights > value.nights ? ' La durée se règle avec − et +, ou sur le moteur officiel.' : ''}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
+          `<span class="hint">${esc(hint || '')}${available ? (max > value.nights ? ` Jusqu’à ${plural(max, 'nuit')} d’affilée : cliquez un jour plus loin pour déplacer le départ, ou utilisez − et +.` : ' Les nuits suivantes ne sont pas disponibles : une seule nuit possible à cette date.') : ''}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
         this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
       }
     }
