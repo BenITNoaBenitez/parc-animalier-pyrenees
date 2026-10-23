@@ -13,16 +13,17 @@
   const API = 'https://websdk.d-edge.com/bestprice';
   const ENGINE = 'https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/';
   const SITE = 'https://www.parc-animalier-pyrenees.com/page/';
+  const MEDIA = 'https://www.parc-animalier-pyrenees.com/medias_front/pages/';
   const FONTS = 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap';
   const CHILD_MAX_AGE = 12;
   const LODGES = {
-    tous: {key: 'tous', id: null, ids: [140910, 140908, 140907, 163456], name: 'Les quatre lodges', eyebrow: 'Nuits insolites · vue d’ensemble', tagline: 'Le meilleur tarif par date parmi La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge', page: 'hebergements', adults: 5, children: 4, color: '#91ab2a'},
-    taniere: {key: 'taniere', id: 140910, name: 'La Tanière', eyebrow: 'Dormir avec les ours bruns', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-ours-bruns', adults: 2, children: 1, color: '#a77c4c'},
-    refuge: {key: 'refuge', id: 140908, name: 'Le Refuge', eyebrow: 'Dormir avec les loups noirs', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-loups-noirs', adults: 5, children: 4, color: '#34575e'},
-    trappeur: {key: 'trappeur', id: 140907, name: 'La Cabane du Trappeur', eyebrow: 'Dormir avec les loups gris', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'nuits-insolites', adults: 4, children: 3, color: '#8c9c60'},
-    asian: {key: 'asian', id: 163456, name: 'Asian Lodge', eyebrow: 'Dormir avec les pandas roux', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-pandas-roux', adults: 5, children: 4, color: '#bb6247'},
-    grange: {key: 'grange', id: 140905, name: 'La Grange', eyebrow: 'Gîte d’exception · Pyrénées Prestige', tagline: 'Gîte entier rénové, au cœur des Pyrénées', page: 'la-grange', adults: 10, children: 9, color: '#7a6a52'},
-    moulin: {key: 'moulin', id: 140906, name: 'Le Moulin', eyebrow: 'Gîte d’exception · Pyrénées Prestige', tagline: 'Moulin rénové, au cœur des Pyrénées', page: 'le-moulin', adults: 5, children: 4, color: '#4f6d8a'}
+    tous: {key: 'tous', photo: MEDIA + '045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg', id: null, ids: [140910, 140908, 140907, 163456], name: 'Les quatre lodges', eyebrow: 'Nuits insolites · vue d’ensemble', tagline: 'Le meilleur tarif par date parmi La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge', page: 'hebergements', adults: 5, children: 4, color: '#91ab2a'},
+    taniere: {key: 'taniere', photo: MEDIA + '033817taniere.jpg', id: 140910, name: 'La Tanière', eyebrow: 'Dormir avec les ours bruns', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-ours-bruns', adults: 2, children: 1, color: '#a77c4c'},
+    refuge: {key: 'refuge', photo: MEDIA + '042005ecolodge_le_refuge_pap-19.jpg', id: 140908, name: 'Le Refuge', eyebrow: 'Dormir avec les loups noirs', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-loups-noirs', adults: 5, children: 4, color: '#34575e'},
+    trappeur: {key: 'trappeur', photo: MEDIA + '115802trappeur.jpg', id: 140907, name: 'La Cabane du Trappeur', eyebrow: 'Dormir avec les loups gris', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'nuits-insolites', adults: 4, children: 3, color: '#8c9c60'},
+    asian: {key: 'asian', photo: MEDIA + '011910shutterstock_32201191.jpg', id: 163456, name: 'Asian Lodge', eyebrow: 'Dormir avec les pandas roux', tagline: 'Dîner, petit-déjeuner & 2 jours au parc inclus', page: 'dormir-avec-les-pandas-roux', adults: 5, children: 4, color: '#bb6247'},
+    grange: {key: 'grange', photo: MEDIA + '115115la_grange_parc_animalier_des_pyrenees-33.jpg', id: 140905, name: 'La Grange', eyebrow: 'Gîte d’exception · Pyrénées Prestige', tagline: 'Gîte entier rénové, au cœur des Pyrénées', page: 'la-grange', adults: 10, children: 9, color: '#7a6a52'},
+    moulin: {key: 'moulin', photo: MEDIA + '114008le_moulin_parc_animalier_des_pyrenees-21.jpg', id: 140906, name: 'Le Moulin', eyebrow: 'Gîte d’exception · Pyrénées Prestige', tagline: 'Moulin rénové, au cœur des Pyrénées', page: 'le-moulin', adults: 5, children: 4, color: '#4f6d8a'}
   };
   const byId = id => Object.values(LODGES).find(l => l.id === Number(id)) || null;
   const iso = d => d.toISOString().slice(0, 10);
@@ -195,6 +196,34 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 .pick .more{font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px}
 .pick .hint{font-size:var(--fs-key);color:var(--muted);line-height:1.6}
 .pick .text{justify-self:start;font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
+.stage{display:grid;overflow:hidden}
+.stage>*{grid-area:1/1;transition:transform .35s ease,opacity .35s ease;outline:none}
+.view-list{transform:translateX(48px);opacity:0;pointer-events:none}
+.stage.list .view-month{transform:translateX(-48px);opacity:0;pointer-events:none}
+.stage.list .view-list{transform:none;opacity:1;pointer-events:auto}
+.view-month[hidden],.view-list[hidden]{display:none}
+.view-list .text{background:none;font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px;color:var(--muted);padding:2px 0 14px}
+.view-list>.eyebrow{display:block;color:var(--muted);letter-spacing:.8px;font-size:var(--fs-key);text-transform:none}
+.view-list h3{margin:6px 0 0;font-family:var(--display);font-size:calc(var(--fs-lodge) * 1.35);font-weight:500;line-height:1.05}
+.view-list .status{margin:8px 0 0;font-size:var(--fs-text);color:var(--muted);line-height:1.6}
+.view-list .nights{margin-top:12px}
+.view-list .book{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding:13px 15px;background:var(--accent);color:var(--accent-text);border-radius:7px;font-size:var(--fs-book);font-weight:600;text-decoration:none}
+.view-list .more{display:inline-block;margin-top:12px;font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px}
+.view-list .note{font-size:var(--fs-key);color:var(--muted);line-height:1.6;margin:12px 0 0}
+.rooms{display:grid;gap:12px;margin-top:14px}
+.room{display:grid;grid-template-columns:34% minmax(0,1fr);background:var(--card);border:1px solid var(--day-border);border-radius:12px;overflow:hidden;min-height:156px;animation:reveal .3s ease}
+.room>img{width:100%;height:100%;min-height:156px;object-fit:cover}
+.room-info{padding:14px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.room-info .eyebrow{color:var(--muted);font-size:var(--fs-key)}
+.room-info h4{margin:0;font-family:var(--display);font-size:var(--fs-lodge);font-weight:500;line-height:1}
+.room-more{font-size:var(--fs-key);color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.room-price{margin-top:auto;padding-top:8px;font-family:var(--display);font-size:calc(var(--fs-price) * .78);line-height:1}.room-price small{font-family:var(--body);font-size:var(--fs-key);color:var(--muted);margin-left:6px}
+.room .reserve{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;padding:11px 13px;background:var(--accent);color:var(--accent-text);border-radius:7px;font-size:var(--fs-book);font-weight:600;text-decoration:none;transition:filter .15s}
+.room .reserve:hover{filter:brightness(1.06)}
+.rooms.single .room{grid-template-columns:42% minmax(0,1fr)}
+:host([theme="sombre"]) .room,:host([theme="nuit"]) .room{background:#ffffff0d}
+:host([design="cercles"]) .room{border-radius:20px}:host([design="cercles"]) .room .reserve{border-radius:30px}
+:host([design="lignes"]) .room{border-radius:0;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}:host([design="lignes"]) .room .reserve{border-radius:0}
 .foot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:var(--fs-key);color:var(--muted);line-height:1.5}
 .foot a{white-space:nowrap;color:var(--ink)}
 /* Design 2 · cercles : le numéro dans une pastille ronde, le prix dessous. */
@@ -237,12 +266,14 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 :host([design="lignes"]) .retry{border-radius:0}
 @keyframes pulse{50%{opacity:.4}}@keyframes reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @container (max-width:640px){.months{grid-template-columns:1fr}}
-@container (max-width:420px){.root{--day-h:50px;--fs-num:12px;--fs-cap:8px;--fs-h2:34px;--fs-price:28px;--circle:30px;--fs-num-lignes:17px}.body{padding:15px 13px 16px}.day{border-radius:6px}.weekdays,.grid{gap:3px}.head{min-height:140px;padding:18px 18px 16px}.foot{display:block}.foot a{display:block;margin-top:6px}.pick{padding:14px}}
+@container (max-width:420px){.room,.rooms.single .room{grid-template-columns:1fr}.room>img{height:150px;min-height:0}.root{--day-h:50px;--fs-num:12px;--fs-cap:8px;--fs-h2:34px;--fs-price:28px;--circle:30px;--fs-num-lignes:17px}.body{padding:15px 13px 16px}.day{border-radius:6px}.weekdays,.grid{gap:3px}.head{min-height:140px;padding:18px 18px 16px}.foot{display:block}.foot a{display:block;margin-top:6px}.pick{padding:14px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}`;
 
   const SHELL = `<div class="root"><header class="head" id="head"><img id="photo" alt="" hidden><span class="eyebrow" id="eyebrow"></span><h2 id="title"></h2><p id="tagline"></p></header>
 <div class="body">
 <div class="top"><div class="occupancy" id="occupancy"></div><span class="live" id="live" role="status"></span></div>
+<div class="stage" id="stage">
+<div class="view-month" id="viewMonth">
 <div class="nav"><button type="button" id="prev" aria-label="Mois précédent">‹</button><h3 id="month" aria-live="polite"></h3><button type="button" id="next" aria-label="Mois suivant">›</button></div>
 <div class="minstay" id="minstay" hidden role="note"><b>2</b><span id="minstayText"></span></div>
 <div class="months" id="months"></div>
@@ -250,6 +281,9 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 <div class="notice" id="notice" role="status"></div>
 <button type="button" class="retry" id="retry" hidden>Actualiser les disponibilités ↻</button>
 <div class="pick" id="pick" hidden tabindex="-1" aria-live="polite"></div>
+</div>
+<div class="view-list" id="viewList" hidden tabindex="-1" aria-live="polite"></div>
+</div>
 <div class="foot"><span id="footText"></span><a id="siteLink" target="_blank" rel="noopener">Voir sur le site du parc ↗</a></div>
 </div></div>`;
 
@@ -308,12 +342,13 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         this.$('next').addEventListener('click', () => this._move(1));
         this.$('retry').addEventListener('click', () => this._load(true));
         this.$('months').addEventListener('click', e => {const b = e.target.closest('button[data-date]'); if (b && !b.disabled) this._pick(b.dataset.date);});
-        this.$('pick').addEventListener('click', e => {if (e.target.closest('#clear')) this._clear(true); else if (e.target.closest('#less')) this._adjust(-1); else if (e.target.closest('#more')) this._adjust(1);});
+        const onPanel = e => {if (e.target.closest('#clear')) this._clear(true); else if (e.target.closest('#less')) this._adjust(-1); else if (e.target.closest('#more')) this._adjust(1);};
+        this.$('pick').addEventListener('click', onPanel); this.$('viewList').addEventListener('click', onPanel);
         this.$('occupancy').addEventListener('change', () => this._readOccupancy());
       }
       _paintHead() {
         if (!this._lodge) return;
-        const img = this.$('photo'), photo = this.getAttribute('photo');
+        const img = this.$('photo'), photo = this.getAttribute('photo') || this._lodge.photo;
         if (photo) {img.src = photo; img.hidden = false;} else {img.removeAttribute('src'); img.hidden = true;}
         this.$('eyebrow').textContent = this._lodge.eyebrow;
         this.$('title').textContent = this.getAttribute('titre') || this._lodge.name;
@@ -427,6 +462,19 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         }
         if (!this._selected) this.$('footText').textContent = 'Choisissez une date d’arrivée.';
       }
+      _showList(show) {
+        const stage = this.$('stage'), month = this.$('viewMonth'), list = this.$('viewList');
+        if (show) {
+          if (stage.classList.contains('list')) return;
+          clearTimeout(this._slideTimer);
+          list.hidden = false; void list.offsetWidth; stage.classList.add('list');
+          this._slideTimer = setTimeout(() => {month.hidden = true;}, 380);
+        } else if (stage.classList.contains('list')) {
+          clearTimeout(this._slideTimer);
+          month.hidden = false; void month.offsetWidth; stage.classList.remove('list');
+          this._slideTimer = setTimeout(() => {list.hidden = true;}, 380);
+        }
+      }
       _paintError(message) {this.$('head').style.display = 'none'; this.$('minstay').hidden = true; this.$('notice').textContent = message; this.$('live').textContent = 'Configuration'; this.$('months').innerHTML = ''; this.$('occupancy').innerHTML = ''; this.$('month').textContent = ''; this.$('pick').hidden = true;}
       _clear(focus) {
         const date = this._selected; this._verify++; if (this._verifier) this._verifier.abort();
@@ -449,7 +497,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         const value = this._results.get(date);
         if (!value || value.status !== 'available') return;
         this._selected = date; this._nights = value.nights; this._paintGrid(); this._paintPick(value, 'Vérification de la date auprès de D-EDGE…');
-        this.$('pick').focus({preventScroll: true});
+        (this._lodge.ids ? this.$('viewList') : this.$('pick')).focus({preventScroll: true});
         const req = ++this._verify; if (this._verifier) this._verifier.abort(); this._verifier = new AbortController();
         fetchRange(this._lodge, date, date, this._occ, this._verifier.signal).then(map => {
           if (req !== this._verify) return;
@@ -461,8 +509,28 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
           this._emit();
         }).catch(() => {if (req !== this._verify) return; this._paintPick(value, 'Vérification impossible pour le moment : le moteur officiel confirmera la disponibilité.'); this._emit();});
       }
+      // Vue d’ensemble : le mois glisse et laisse place aux logements disponibles cette nuit, avec photo, prix et réservation.
+      _paintList(value, hint) {
+        const list = this.$('viewList');
+        if (!value) {this._showList(false); this.$('footText').textContent = 'Choisissez une date d’arrivée.'; return;}
+        const o = this._occ, offers = value.offers || [], count = offers.length, nights = this._nights || value.nights, stay = this._stay(), max = stay ? stay.max : value.nights;
+        const who = `${plural(o.adults, 'adulte')}${o.children ? `, ${plural(o.children, 'enfant')}` : ''}`;
+        const short = d => cap(fmt(d, {weekday: 'short', day: 'numeric', month: 'long'}));
+        const stepper = count ? `<div class="nights" role="group" aria-label="Durée du séjour"><span>Durée</span><button type="button" id="less" aria-label="Une nuit de moins"${nights <= value.nights ? ' disabled' : ''}>−</button><strong aria-live="polite">${plural(nights, 'nuit')}</strong><button type="button" id="more" aria-label="Une nuit de plus"${nights >= max ? ' disabled' : ''}>+</button></div>` : '';
+        const card = x => {const n = Math.max(nights, x.nights); return `<article class="room"><img src="${x.room.photo || ''}" alt="${esc(x.room.name)}" loading="lazy"><div class="room-info"><span class="eyebrow">${esc(x.room.eyebrow || '')}</span><h4>${esc(x.room.name)}</h4><a class="room-more" href="${SITE}${x.room.page}" target="_blank" rel="noopener">Découvrir le logement ↗</a><div class="room-price">${money(x.price)}<small>la nuit · dès${x.nights > 1 ? ` · ${plural(x.nights, 'nuit')} min.` : ''}</small></div><a class="reserve" href="${bookingUrl(x, o, true, n)}" target="_blank" rel="noopener" aria-label="Réserver ${esc(x.room.name)}, ${plural(n, 'nuit')} à partir du ${short(value.date)}, dès ${money(x.price)} la nuit">Réserver ${plural(n, 'nuit')} <span>↗</span></a></div></article>`;};
+        list.innerHTML = `<button type="button" class="text" id="clear">← Changer de date</button>` +
+          `<span class="eyebrow">${short(value.date)} → ${short(addDays(value.date, nights))} · ${plural(nights, 'nuit')} · ${who}</span>` +
+          `<h3>${count === 1 ? 'Votre logement' : count > 1 ? 'Choisissez votre logement' : 'Cette nuit n’est plus confirmée'}</h3>` +
+          `<p class="status">${count ? `${plural(count, 'logement')} disponible${count > 1 ? 's' : ''} pour cette nuit. ` : 'La disponibilité a changé. Choisissez une autre date. '}${esc(hint || '')}${value.unknown ? ' Vérification incomplète : d’autres logements peuvent être disponibles.' : ''}${count && max > value.nights ? ` Jusqu’à ${plural(max, 'nuit')} d’affilée.` : ''}</p>` +
+          stepper + `<div class="rooms${count === 1 ? ' single' : ''}">${offers.map(card).join('')}</div>` +
+          (count ? `<p class="note">Tarif par nuit pour ${who}, hors taxe de séjour. Disponibilités, prix final et conditions confirmés sur le moteur officiel.</p>` : `<a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
+          `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`;
+        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
+        this._showList(true);
+      }
       _emit() {this.dispatchEvent(new CustomEvent('parc-calendrier:selection', {bubbles: true, composed: true, detail: this.selection}));}
       _paintPick(value, hint) {
+        if (this._lodge.ids) return this._paintList(value, hint);
         const el = this.$('pick');
         if (!value) {el.hidden = true; el.innerHTML = ''; this.$('footText').textContent = 'Choisissez une date d’arrivée.'; return;}
         const o = this._occ, available = value.status === 'available', nights = this._nights || value.nights;
