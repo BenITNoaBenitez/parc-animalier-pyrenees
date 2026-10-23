@@ -40,7 +40,7 @@ La quatrième partie du prototype affiche ces sept calendriers dans la charte du
 
 <!-- install:start -->
 ```html
-<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.2.js" integrity="sha384-KUH2UnyXEcMmBskiKPZh4672duSpm21NgF5sdhF7j1O5LvvMLoOG/WtCDPDXJYbe" crossorigin="anonymous" defer></script>
+<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.2.js" integrity="sha384-sLXxbJBCou7Jd+wBhxhzyK9BLLXqxNiG0iNMVT9ONQUl9KZFMaPgRvfyQ9H0QbKT" crossorigin="anonymous" defer></script>
 
 <parc-calendrier logement="taniere"></parc-calendrier>
 ```

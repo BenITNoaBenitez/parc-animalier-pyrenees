@@ -186,10 +186,10 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 .pick[hidden]{display:none}.pick{margin-top:16px;padding:16px 18px;border-radius:12px;background:var(--day-bg);border:1px solid var(--day-border);display:grid;gap:9px;animation:reveal .3s ease;outline:none}
 .pick .eyebrow{color:var(--muted);letter-spacing:.8px;font-size:var(--fs-key);text-transform:none}
 .pick .lodge{font-family:var(--display);font-size:var(--fs-lodge);font-weight:500;line-height:1}
-.pick .nights{display:flex;align-items:center;gap:8px;font-size:var(--fs-text);color:var(--muted)}
-.pick .nights strong{font-size:var(--fs-select);color:var(--ink);min-width:56px;text-align:center}
-.pick .nights button{width:28px;height:28px;border-radius:50%;border:1px solid var(--day-border);background:var(--card);color:var(--ink);font-size:16px;line-height:1}
-.pick .nights button:hover:not(:disabled){border-color:var(--accent)}.pick .nights button:disabled{opacity:.3}
+.nights{display:flex;align-items:center;gap:8px;font-size:var(--fs-text);color:var(--muted)}
+.nights strong{font-size:var(--fs-select);color:var(--ink);min-width:56px;text-align:center}
+.nights button{width:28px;height:28px;border-radius:50%;border:1px solid var(--day-border);background:var(--card);color:var(--ink);font-size:16px;line-height:1}
+.nights button:hover:not(:disabled){border-color:var(--accent)}.nights button:disabled{opacity:.3}
 .pick .price{font-family:var(--display);font-size:var(--fs-price);line-height:1}.pick .price small{font-family:var(--body);font-size:var(--fs-key);color:var(--muted);margin-left:7px}
 .pick .book{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:13px 15px;background:var(--accent);color:var(--accent-text);border-radius:7px;font-size:var(--fs-book);font-weight:600;text-decoration:none;transition:filter .15s}
 .pick .book:hover{filter:brightness(1.06)}
@@ -262,7 +262,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 :host([design="lignes"]) .nav button{border-radius:0;border:0;border-bottom:1px solid var(--line)}
 :host([design="lignes"]) .nav h3{font-family:var(--display);font-size:calc(var(--fs-nav) * 1.45);text-transform:uppercase;letter-spacing:.5px}
 :host([design="lignes"]) .pick{border-radius:0;border:0;border-top:2px solid var(--accent);background:none;padding:16px 0 0}
-:host([design="lignes"]) .pick .book{border-radius:0}:host([design="lignes"]) .pick .nights button{border-radius:0}
+:host([design="lignes"]) .pick .book{border-radius:0}:host([design="lignes"]) .nights button{border-radius:0}
 :host([design="lignes"]) .retry{border-radius:0}
 @keyframes pulse{50%{opacity:.4}}@keyframes reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @container (max-width:640px){.months{grid-template-columns:1fr}}
