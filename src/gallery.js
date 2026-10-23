@@ -2,7 +2,7 @@
  const SITE='https://www.parc-animalier-pyrenees.com/', MEDIA=SITE+'medias_front/pages/', L=parcCalendrier.LODGES;
  const SCRIPT=EMBED_SCRIPT_TAG;
  document.querySelector('.install code').textContent=SCRIPT;
- const FALLBACK='  <a href="https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/">Réserver sur le moteur officiel</a>';
+ const FALLBACK='  <a href="https://www.secure-hotel-booking.com/d-edge/Parc-Animalier-Des-Pyrenees/JLPH/">Réserver</a>';
  // Les sept calendriers relevés sur le site le 15 octobre 2026, avec les limites de voyageurs de chaque widget officiel.
  const CALENDARS=[
   {logement:'tous',asset:'parc',wide:true,attrs:{mois:'2'},photo:'045810035120000437parcanimalierdespyrenees-ayzacost-photoaspheries.jpg',note:'Page Hébergements · les quatre nuits insolites : meilleur prix par date · jusqu’à 5 adultes et 4 enfants (le widget du site, lui, mélange lodges et gîtes)'},
