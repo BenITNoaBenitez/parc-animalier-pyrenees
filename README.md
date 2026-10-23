@@ -40,13 +40,13 @@ La quatrième partie du prototype affiche ces sept calendriers dans la charte du
 
 <!-- install:start -->
 ```html
-<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.1.js" integrity="sha384-W7sNafEia6lfVO471c6OpX3AyjNU3O5mAa66ajE+1tnUFatVsidC2MIjOYCF47py" crossorigin="anonymous" defer></script>
+<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.2.js" integrity="sha384-sLXxbJBCou7Jd+wBhxhzyK9BLLXqxNiG0iNMVT9ONQUl9KZFMaPgRvfyQ9H0QbKT" crossorigin="anonymous" defer></script>
 
 <parc-calendrier logement="taniere"></parc-calendrier>
 ```
 <!-- install:end -->
 
-Le script est publié sous un nom versionné (`parc-calendrier-1.0.1.js`) qui ne change jamais une fois en ligne, avec son empreinte d’intégrité (`integrity`) : le navigateur refuse d’exécuter un fichier qui ne correspond pas exactement. Toute modification de la balise passe par une nouvelle version dans `build.mjs`, un nouveau fichier et une nouvelle empreinte ; les balises déjà copiées continuent de fonctionner avec l’ancienne version. `parc-calendrier.js` sans numéro reste la dernière version, sans empreinte, pour les essais. Hébergement temporaire sur GitHub Pages : pour la mise en ligne définitive, copier le fichier versionné sur le domaine du parc et adapter l’adresse. Aucune bibliothèque requise ; les polices Google sont chargées seulement si la page ne les déclare pas déjà.
+Le script est publié sous un nom versionné (`parc-calendrier-1.0.2.js`) qui ne change jamais une fois en ligne, avec son empreinte d’intégrité (`integrity`) : le navigateur refuse d’exécuter un fichier qui ne correspond pas exactement. Toute modification de la balise passe par une nouvelle version dans `build.mjs`, un nouveau fichier et une nouvelle empreinte ; les balises déjà copiées continuent de fonctionner avec l’ancienne version. `parc-calendrier.js` sans numéro reste la dernière version, sans empreinte, pour les essais. Hébergement temporaire sur GitHub Pages : pour la mise en ligne définitive, copier le fichier versionné sur le domaine du parc et adapter l’adresse. Aucune bibliothèque requise ; les polices Google sont chargées seulement si la page ne les déclare pas déjà.
 
 ### Attributs
 
@@ -56,7 +56,7 @@ Le script est publié sous un nom versionné (`parc-calendrier-1.0.1.js`) qui ne
 | `chambre` | identifiant D-EDGE, ex. `140910` | Alternative à `logement`. |
 | `adultes`, `enfants`, `ages` | nombres, âges séparés par des virgules | Composition de départ ; le visiteur la modifie dans les limites du logement. |
 | `mois` | `1` ou `2` | Nombre de mois affichés côte à côte. |
-| `photo`, `titre`, `sous-titre` | texte / URL | En-tête de la carte. |
+| `photo`, `titre`, `sous-titre` | texte / URL | En-tête de la carte ; par défaut, la photo officielle du logement. |
 | `design` | `cases`, `cercles`, `lignes` | Trois designs ; `cases` par défaut. |
 | `theme` | `clair`, `sombre` | Mode clair par défaut ; `sombre` : fond bleu nuit, sélection dorée (`nuit` reste accepté). |
 | `compact` | présent ou non | Sans en-tête. |
@@ -70,7 +70,7 @@ La balise émet l’événement `parc-calendrier:selection` (détail : date, dé
 - Les gîtes imposent un séjour minimum : la date de départ et le lien de réservation en tiennent compte.
 - Le lien « Réserver » ouvre le moteur officiel avec logement, dates et voyageurs préremplis ; le prix final et les conditions y sont confirmés.
 - Un service qui ne répond pas n’est jamais affiché comme complet ; un bouton permet de réessayer.
-- La vue d’ensemble (`tous`) affiche le meilleur prix par date parmi les quatre lodges, La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge, et le logement correspondant. Les gîtes ont leurs propres calendriers.
+- La vue d’ensemble (`tous`) interroge les quatre lodges séparément, La Tanière, Le Refuge, La Cabane du Trappeur et Asian Lodge : un point par logement disponible dans chaque case, le meilleur prix affiché, et au clic le mois glisse pour laisser place aux logements disponibles cette nuit, avec photo, prix et bouton de réservation. Un lodge qui ne répond pas rend ses dates « à vérifier », jamais « complet ». Les gîtes ont leurs propres calendriers.
 
 ## Développement
 

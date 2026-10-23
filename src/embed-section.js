@@ -12,7 +12,7 @@
  ];
  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
  const attrs=c=>Object.entries(c.attrs||{}).map(([k,v])=>` ${k}="${v}"`).join('');
- const tag=c=>`${EMBED_SCRIPT_TAG}\n<parc-calendrier logement="${c.logement}"${attrs(c)} photo="${c.photo}"></parc-calendrier>`;
+ const tag=c=>`${EMBED_SCRIPT_TAG}\n<parc-calendrier logement="${c.logement}"${attrs(c)}></parc-calendrier>`;
  document.querySelector('.embed-section .install code').textContent=EMBED_SCRIPT_TAG;
  document.getElementById('embed-grid').innerHTML=CALENDARS.map(c=>`<article class="embed-card${c.wide?' wide':''}"><parc-calendrier logement="${c.logement}"${attrs(c)} photo="${ASSETS[c.asset]}"></parc-calendrier><div class="embed-meta"><div class="site"><a href="${SITE}page/${c.page}" target="_blank" rel="noopener">/page/${c.page} ↗</a><small>${c.note}</small></div><div class="snippet"><pre><code>${esc(tag(c))}</code></pre><button class="copy" type="button">Copier</button></div></div></article>`).join('');
  document.querySelectorAll('.embed-section .copy').forEach(button=>button.addEventListener('click',async()=>{

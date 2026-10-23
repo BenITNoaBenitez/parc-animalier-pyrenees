@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 // Version publiée de la balise : à incrémenter à chaque modification de src/embed/parc-calendrier.js.
 // Le fichier versionné ne change jamais une fois publié : les balises copiées restent valides avec leur empreinte.
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 const PAGES = 'https://benitnoabenitez.github.io/parc-animalier-pyrenees/';
 const read = name => fs.readFile(new URL(name, import.meta.url), 'utf8');
 let fonts = await read('assets/fonts.css');
