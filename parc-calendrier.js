@@ -165,7 +165,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 .day .min{font-size:var(--fs-min);line-height:1.2;color:#8d664b;white-space:nowrap}:host([theme="sombre"]) .day .min,:host([theme="nuit"]) .day .min{color:#e8c48b}
 .day.start .min,.day.end .min,.day.within .min{display:none}
 .day.can-end{cursor:pointer}.day.can-end:hover{box-shadow:inset 0 0 0 1px var(--accent);transform:none}
-.day.full .cap,.day.closed .cap{color:#9d735e}.day.unknown .cap{color:var(--muted)}.day.past{opacity:.35}
+.day.full .cap,.day.closed .cap{color:var(--muted);opacity:.75}.day.unknown .cap{color:var(--muted)}.day.past{opacity:.35}
 .day.loading .cap{background:var(--day-bg);border-radius:4px;color:transparent;width:24px;animation:pulse 1.3s ease-in-out infinite}
 .day.start,.day.end{background:var(--sel-bg)!important;border-color:var(--sel-bg)!important;color:var(--sel-text);transform:none!important;opacity:1}
 .day.start{border-radius:8px 3px 3px 8px}.day.end{border-radius:3px 8px 8px 3px}
@@ -196,10 +196,13 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 .pick .more{font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px}
 .pick .hint{font-size:var(--fs-key);color:var(--muted);line-height:1.6}
 .pick .text{justify-self:start;font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
-.stage{display:grid;overflow:hidden}
-.stage>*{grid-area:1/1;transition:transform .35s ease,opacity .35s ease;outline:none}
-.view-list{transform:translateX(48px);opacity:0;pointer-events:none}
-.stage.list .view-month{transform:translateX(-48px);opacity:0;pointer-events:none}
+.stage{display:grid;overflow:hidden;transition:height .5s cubic-bezier(.22,.61,.36,1)}
+.stage>*{grid-area:1/1;align-self:start;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .4s ease;outline:none;will-change:transform,opacity}
+.view-list{transform:translateX(32px);opacity:0;pointer-events:none}
+.stage.list .view-month{transform:translateX(-32px);opacity:0;pointer-events:none}
+.stage.list .room{animation:rise .45s cubic-bezier(.22,.61,.36,1) both}
+.stage.list .room:nth-child(2){animation-delay:.07s}.stage.list .room:nth-child(3){animation-delay:.14s}.stage.list .room:nth-child(4){animation-delay:.21s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .stage.list .view-list{transform:none;opacity:1;pointer-events:auto}
 .view-month[hidden],.view-list[hidden]{display:none}
 .view-list .text{background:none;font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px;color:var(--muted);padding:2px 0 14px}
@@ -211,7 +214,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
 .view-list .more{display:inline-block;margin-top:12px;font-size:var(--fs-text);text-decoration:underline;text-underline-offset:3px}
 .view-list .note{font-size:var(--fs-key);color:var(--muted);line-height:1.6;margin:12px 0 0}
 .rooms{display:grid;gap:12px;margin-top:14px}
-.room{display:grid;grid-template-columns:34% minmax(0,1fr);background:var(--card);border:1px solid var(--day-border);border-radius:12px;overflow:hidden;min-height:156px;animation:reveal .3s ease}
+.room{display:grid;grid-template-columns:34% minmax(0,1fr);background:var(--card);border:1px solid var(--day-border);border-radius:12px;overflow:hidden;min-height:156px}
 .room>img{width:100%;height:100%;min-height:156px;object-fit:cover}
 .room-info{padding:14px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
 .room-info .eyebrow{color:var(--muted);font-size:var(--fs-key)}
@@ -344,6 +347,11 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         this.$('months').addEventListener('click', e => {const b = e.target.closest('button[data-date]'); if (b && !b.disabled) this._pick(b.dataset.date);});
         const onPanel = e => {if (e.target.closest('#clear')) this._clear(true); else if (e.target.closest('#less')) this._adjust(-1); else if (e.target.closest('#more')) this._adjust(1);};
         this.$('pick').addEventListener('click', onPanel); this.$('viewList').addEventListener('click', onPanel);
+        // Pendant le glissement, la hauteur suit la vue d’arrivée même si elle grandit (photos qui se chargent, revérification).
+        if (typeof ResizeObserver !== 'undefined') {
+          const follow = () => {const st = this.$('stage'); if (!st.style.height) return; const target = st.classList.contains('list') ? this.$('viewList') : this.$('viewMonth'); st.style.height = target.offsetHeight + 'px';};
+          const ro = new ResizeObserver(follow); ro.observe(this.$('viewList')); ro.observe(this.$('viewMonth'));
+        }
         this.$('occupancy').addEventListener('change', () => this._readOccupancy());
       }
       _paintHead() {
@@ -462,18 +470,19 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         }
         if (!this._selected) this.$('footText').textContent = 'Choisissez une date d’arrivée.';
       }
+      // Glissement : les deux vues se croisent pendant que la hauteur du bloc passe en douceur de l’une à l’autre.
       _showList(show) {
         const stage = this.$('stage'), month = this.$('viewMonth'), list = this.$('viewList');
-        if (show) {
-          if (stage.classList.contains('list')) return;
-          clearTimeout(this._slideTimer);
-          list.hidden = false; void list.offsetWidth; stage.classList.add('list');
-          this._slideTimer = setTimeout(() => {month.hidden = true;}, 380);
-        } else if (stage.classList.contains('list')) {
-          clearTimeout(this._slideTimer);
-          month.hidden = false; void month.offsetWidth; stage.classList.remove('list');
-          this._slideTimer = setTimeout(() => {list.hidden = true;}, 380);
-        }
+        if (show === stage.classList.contains('list')) return;
+        const [from, to] = show ? [month, list] : [list, month];
+        clearTimeout(this._slideTimer);
+        const start = stage.offsetHeight;
+        to.hidden = false;
+        stage.style.height = start + 'px';
+        void stage.offsetHeight;
+        stage.classList.toggle('list', show);
+        stage.style.height = to.offsetHeight + 'px';
+        this._slideTimer = setTimeout(() => {from.hidden = true; stage.style.height = '';}, 520);
       }
       _paintError(message) {this.$('head').style.display = 'none'; this.$('minstay').hidden = true; this.$('notice').textContent = message; this.$('live').textContent = 'Configuration'; this.$('months').innerHTML = ''; this.$('occupancy').innerHTML = ''; this.$('month').textContent = ''; this.$('pick').hidden = true;}
       _clear(focus) {
@@ -526,6 +535,8 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
           (count ? `<p class="note">Tarif par nuit pour ${who}, hors taxe de séjour. Disponibilités, prix final et conditions confirmés sur le moteur officiel.</p>` : `<a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
           `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`;
         this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
+        const stage = this.$('stage');
+        if (stage.classList.contains('list') && stage.style.height) stage.style.height = list.offsetHeight + 'px';
         this._showList(true);
       }
       _emit() {this.dispatchEvent(new CustomEvent('parc-calendrier:selection', {bubbles: true, composed: true, detail: this.selection}));}

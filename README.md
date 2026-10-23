@@ -40,13 +40,13 @@ La quatrième partie du prototype affiche ces sept calendriers dans la charte du
 
 <!-- install:start -->
 ```html
-<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.2.js" integrity="sha384-sLXxbJBCou7Jd+wBhxhzyK9BLLXqxNiG0iNMVT9ONQUl9KZFMaPgRvfyQ9H0QbKT" crossorigin="anonymous" defer></script>
+<script src="https://benitnoabenitez.github.io/parc-animalier-pyrenees/parc-calendrier-1.0.3.js" integrity="sha384-CwPU2iuMr/Mejyl1xwV7RrY57l3Pj/Owm1CmY73MiPg5HLhU9nDIk+Wy5MCtzT/i" crossorigin="anonymous" defer></script>
 
 <parc-calendrier logement="taniere"></parc-calendrier>
 ```
 <!-- install:end -->
 
-Le script est publié sous un nom versionné (`parc-calendrier-1.0.2.js`) qui ne change jamais une fois en ligne, avec son empreinte d’intégrité (`integrity`) : le navigateur refuse d’exécuter un fichier qui ne correspond pas exactement. Toute modification de la balise passe par une nouvelle version dans `build.mjs`, un nouveau fichier et une nouvelle empreinte ; les balises déjà copiées continuent de fonctionner avec l’ancienne version. `parc-calendrier.js` sans numéro reste la dernière version, sans empreinte, pour les essais. Hébergement temporaire sur GitHub Pages : pour la mise en ligne définitive, copier le fichier versionné sur le domaine du parc et adapter l’adresse. Aucune bibliothèque requise ; les polices Google sont chargées seulement si la page ne les déclare pas déjà.
+Le script est publié sous un nom versionné (`parc-calendrier-1.0.3.js`) qui ne change jamais une fois en ligne, avec son empreinte d’intégrité (`integrity`) : le navigateur refuse d’exécuter un fichier qui ne correspond pas exactement. Toute modification de la balise passe par une nouvelle version dans `build.mjs`, un nouveau fichier et une nouvelle empreinte ; les balises déjà copiées continuent de fonctionner avec l’ancienne version. `parc-calendrier.js` sans numéro reste la dernière version, sans empreinte, pour les essais. Hébergement temporaire sur GitHub Pages : pour la mise en ligne définitive, copier le fichier versionné sur le domaine du parc et adapter l’adresse. Aucune bibliothèque requise ; les polices Google sont chargées seulement si la page ne les déclare pas déjà.
 
 ### Attributs
 
