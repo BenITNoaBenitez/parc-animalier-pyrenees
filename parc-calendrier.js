@@ -1,7 +1,7 @@
 /*! <parc-calendrier> — Parc Animalier des Pyrénées · prototype BenIT
  * Les sept calendriers du site officiel (quatre nuits insolites, deux gîtes, vue d’ensemble), refaits à la charte du prototype.
  * Données : service public du widget D-EDGE, avec le jeton public déjà exposé sur les pages officielles.
- * Réservation : moteur officiel D-EDGE. Cette balise ne traite ni paiement ni donnée personnelle.
+ * Réservation : moteur de réservation D-EDGE du parc. Cette balise ne traite ni paiement ni donnée personnelle.
  * Usage : <script src="parc-calendrier.js" defer></script> puis <parc-calendrier logement="taniere"></parc-calendrier>
  * Attributs : logement | chambre, adultes, enfants, ages, mois (1|2), design (cases|cercles|lignes), theme (clair|sombre), photo, titre, sous-titre, compact.
  * Un clic choisit la nuit du jour cliqué et affiche ses deux jours, arrivée et départ ; un clic plus loin déplace le départ
@@ -458,7 +458,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         const today = parisToday(), any = Array.from(this._results.values()).some(v => v.status === 'available' && v.date >= today);
         const partial = !this._loading && !this._failed && !!this._results.partial;
         this.$('live').textContent = this._loading ? 'Connexion…' : this._failed ? 'Connexion indisponible' : partial ? 'Données partielles' : '';
-        this.$('notice').textContent = this._loading ? '' : this._failed ? 'Les disponibilités ne peuvent pas être chargées. Réessayez ou utilisez le moteur officiel.' : partial ? 'Un logement n’a pas répondu : ses dates sont marquées « à vérifier ». Réessayez.' : !any ? 'Aucune date disponible pour cette composition sur la période affichée. Essayez le mois suivant ou une autre composition.' : '';
+        this.$('notice').textContent = this._loading ? '' : this._failed ? 'Les disponibilités ne peuvent pas être chargées. Réessayez dans un instant.' : partial ? 'Un logement n’a pas répondu : ses dates sont marquées « à vérifier ». Réessayez.' : !any ? 'Aucune date disponible pour cette composition sur la période affichée. Essayez le mois suivant ou une autre composition.' : '';
         this.$('retry').hidden = this._loading || !(this._failed || partial);
         const mins = Array.from(this._results.values()).filter(v => v.status === 'available' && v.date >= today).map(v => v.nights);
         const lowest = mins.length ? Math.min(...mins) : 1, highest = mins.length ? Math.max(...mins) : 1;
@@ -500,7 +500,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
       _setNights(nights) {
         const value = this._selected && this._results.get(this._selected);
         if (!value || value.status !== 'available' || nights === this._nights) return;
-        this._nights = nights; this._paintGrid(); this._paintPick(value, 'Départ déplacé. Le tarif total est confirmé sur le moteur officiel.'); this._emit();
+        this._nights = nights; this._paintGrid(); this._paintPick(value, 'Départ déplacé.'); this._emit();
       }
       _select(date) {
         const value = this._results.get(date);
@@ -514,9 +514,9 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
           if (fresh) {this._results.set(date, fresh); if (this._nights < fresh.nights) this._nights = fresh.nights;}
           const current = this._results.get(date);
           this._paintGrid();
-          this._paintPick(current, fresh && fresh.status === 'available' ? 'Disponibilité confirmée à l’instant. Prix final et conditions confirmés sur le moteur officiel.' : 'Cette date n’est plus confirmée pour cette composition. Choisissez une autre date ou vérifiez sur le moteur officiel.');
+          this._paintPick(current, fresh && fresh.status === 'available' ? 'Disponibilité confirmée à l’instant.' : 'Cette date n’est plus confirmée pour cette composition. Choisissez une autre date.');
           this._emit();
-        }).catch(() => {if (req !== this._verify) return; this._paintPick(value, 'Vérification impossible pour le moment : le moteur officiel confirmera la disponibilité.'); this._emit();});
+        }).catch(() => {if (req !== this._verify) return; this._paintPick(value, 'Vérification impossible pour le moment : la disponibilité sera confirmée à la réservation.'); this._emit();});
       }
       // Vue d’ensemble : le mois glisse et laisse place aux logements disponibles cette nuit, avec photo, prix et réservation.
       _paintList(value, hint) {
@@ -532,9 +532,9 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
           `<h3>${count === 1 ? 'Votre logement' : count > 1 ? 'Choisissez votre logement' : 'Cette nuit n’est plus confirmée'}</h3>` +
           `<p class="status">${count ? `${plural(count, 'logement')} disponible${count > 1 ? 's' : ''} pour cette nuit. ` : 'La disponibilité a changé. Choisissez une autre date. '}${esc(hint || '')}${value.unknown ? ' Vérification incomplète : d’autres logements peuvent être disponibles.' : ''}${count && max > value.nights ? ` Jusqu’à ${plural(max, 'nuit')} d’affilée.` : ''}</p>` +
           stepper + `<div class="rooms${count === 1 ? ' single' : ''}">${offers.map(card).join('')}</div>` +
-          (count ? `<p class="note">Tarif par nuit pour ${who}, hors taxe de séjour. Disponibilités, prix final et conditions confirmés sur le moteur officiel.</p>` : `<a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
+          (count ? `<p class="note">Tarif par nuit pour ${who}, hors taxe de séjour.</p>` : `<a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates <span>↗</span></a>`) +
           `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`;
-        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
+        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour.`;
         const stage = this.$('stage');
         if (stage.classList.contains('list') && stage.style.height) stage.style.height = list.offsetHeight + 'px';
         this._showList(true);
@@ -554,11 +554,11 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         el.hidden = false;
         el.innerHTML = `<span class="eyebrow">${short(value.date)} → ${short(addDays(value.date, nights))} · ${stay} · ${who}</span>` +
           (this._lodge.ids && value.room ? `<span class="lodge">${esc(value.room.name)}</span>` : '') + badge + stepper +
-          (available ? `<span class="price">${money(value.price)}<small>par nuit · dès</small></span><a class="book" href="${bookingUrl(value, o, true, nights)}" target="_blank" rel="noopener">Réserver ${plural(nights, 'nuit')} sur le moteur officiel <span>↗</span></a>` : `<span class="price">Indisponible</span><a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates sur le moteur officiel <span>↗</span></a>`) +
+          (available ? `<span class="price">${money(value.price)}<small>par nuit · dès</small></span><a class="book" href="${bookingUrl(value, o, true, nights)}" target="_blank" rel="noopener">Réserver ${plural(nights, 'nuit')} <span>↗</span></a>` : `<span class="price">Indisponible</span><a class="book" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Voir d’autres dates <span>↗</span></a>`) +
           (this._lodge.ids && available && value.offers.length > 1 ? `<div class="others"><span class="eyebrow">Aussi disponible${value.offers.length > 2 ? 's' : ''} cette nuit</span>${value.offers.slice(1).map(x => `<a href="${bookingUrl(x, o, true, Math.max(nights, x.nights))}" target="_blank" rel="noopener"><i style="background:${x.room.color}"></i><span>${esc(x.room.name)}</span><b>${money(x.price)}</b><small>par nuit · dès</small><em>↗</em></a>`).join('')}</div>` : '') +
           (this._lodge.id || !available ? '' : `<a class="more" href="${bookingUrl(value, o, false, nights)}" target="_blank" rel="noopener">Tous les hébergements à ces dates ↗</a>`) +
           `<span class="hint">${esc(hint || '')}${available ? (max > value.nights ? ` Jusqu’à ${plural(max, 'nuit')} d’affilée : cliquez un jour plus loin pour déplacer le départ, ou utilisez − et +.` : ' Les nuits suivantes ne sont pas disponibles : une seule nuit possible à cette date.') : ''}</span><button type="button" class="text" id="clear">← Changer de date</button>`;
-        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour. Total confirmé sur le moteur officiel.`;
+        this.$('footText').textContent = `Tarif pour ${who}, hors taxe de séjour.`;
       }
     }
     api.ParcCalendrier = ParcCalendrier;
