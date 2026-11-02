@@ -308,7 +308,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
       connectedCallback() {
         if (!this._mounted) {this._mounted = true; ensureFonts(); this._mount();}
         window.addEventListener('offline', this._onOffline); window.addEventListener('online', this._onOnline);
-        this._configure(); this._load();
+        this._configure(); this._seekFirst(); this._load();
       }
       disconnectedCallback() {
         window.removeEventListener('offline', this._onOffline); window.removeEventListener('online', this._onOnline);
@@ -317,7 +317,7 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
       attributeChangedCallback(name) {
         if (!this._mounted || !this.isConnected) return;
         if (name === 'photo' || name === 'titre' || name === 'sous-titre') {this._paintHead(); return;}
-        this._configure(); this._load();
+        this._configure(); this._seekFirst(); this._load();
       }
       get selection() {
         const v = this._selected && this._results.get(this._selected);
@@ -373,9 +373,11 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
       _readOccupancy() {
         const sr = this.shadowRoot, children = sr.getElementById('children');
         this._occ = clampOccupancy(this._lodge, {adults: sr.getElementById('adults').value, children: children ? children.value : 0, ages: Array.from(sr.querySelectorAll('select[data-age]')).map(s => s.value)});
-        this._paintOccupancy(); this._load();
+        this._paintOccupancy(); this._seekFirst(); this._load();
       }
-      _move(n) {this._month = shiftMonth(this._month, n); this._load();}
+      // À l’ouverture, le calendrier avance seul jusqu’au premier mois qui a une nuit disponible (18 mois au plus).
+      _seekFirst() {this._month = monthStart(parisToday()); this._seek = 18;}
+      _move(n) {this._seek = 0; this._month = shiftMonth(this._month, n); this._load();}
       _range() {
         const today = parisToday();
         return {from: this._month < today ? today : this._month, to: monthEnd(this._months === 2 ? shiftMonth(this._month, 1) : this._month)};
@@ -389,12 +391,20 @@ select{font:inherit;font-size:var(--fs-select);color:var(--ink);background:var(-
         const {from, to} = this._range();
         const key = [this._lodge.key, this._occ.adults, this._occ.children, this._occ.ages.join('-'), from, to].join('|');
         const hit = this._cache.get(key);
-        if (!force && hit && Date.now() - hit.time < 60000) {this._results = hit.data; this._loading = false; this._failed = false; this._paint(); return;}
+        if (!force && hit && Date.now() - hit.time < 60000 && !this._seek) {this._results = hit.data; this._loading = false; this._failed = false; this._paint(); return;}
         this._loading = true; this._failed = false; this._results = new Map(); this._paint();
+        if (this._seek > 0) this.$('live').textContent = 'Recherche des prochaines disponibilités…';
         fetchRange(this._lodge, from, to, this._occ, this._controller.signal)
           .then(data => {if (req !== this._req) return; this._results = data; this._cache.set(key, {time: Date.now(), data});})
           .catch(() => {if (req !== this._req) return; this._results = new Map(); this._failed = true;})
-          .then(() => {if (req !== this._req) return; this._loading = false; this._paint();});
+          .then(() => {
+            if (req !== this._req) return;
+            const today = parisToday(), found = Array.from(this._results.values()).some(v => v.status === 'available' && v.date >= today);
+            if (this._seek > 0 && !this._failed && !found) {this._seek -= this._months; this._month = shiftMonth(this._month, this._months); this._load(); return;}
+            // Deux mois affichés : si les nuits ne commencent qu’au second, on décale d’un mois pour l’ouvrir en premier.
+            if (this._seek > 0 && this._months === 2 && found && !Array.from(this._results.values()).some(v => v.status === 'available' && v.date >= today && v.date < shiftMonth(this._month, 1))) {this._seek = 0; this._month = shiftMonth(this._month, 1); this._load(); return;}
+            this._seek = 0; this._loading = false; this._paint();
+          });
       }
       _paint() {this._paintNav(); this._paintGrid(); this._paintStatus();}
       _paintNav() {
